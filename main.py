@@ -263,8 +263,20 @@ Respond with ONLY valid JSON:
     else:
         module = "Application Functionality"
 
-    # Pattern A: Dashboard count zero / missing
-    if ("dash" in text_lower or "dashboard" in text_lower) and any(w in text_lower for w in ["zero", "0", "missing", "not showing", "dekha jacce na", "deka jacce na", "ashche na"]):
+    # Pattern A: Prolonged inactivity / navigation freeze / refresh required
+    if any(w in text_lower for w in ["onk somoy", "onek somoy", "dore", "thaka hoy"]) and any(w in text_lower for w in ["user page", "users", "page ta ase na", "load hoy na", "refresh"]):
+        module = "Super Admin > User Management / Navigation"
+        title = "Verify navigation to Users page after prolonged activity in Grant Application Form"
+        scenario = "Verify client-side route navigation to the Users page without requiring a browser refresh."
+        test_data = "Super Admin active session"
+        steps = "1. Log in as Super Admin.\n2. Navigate to 'Grant Application Form' and remain on the page for an extended duration.\n3. Click on the 'Users' menu from the left navigation sidebar.\n4. Observe whether the Users page loads properly."
+        expected = "The Users page should load seamlessly and display the user list without requiring a manual page refresh."
+        actual = "The Users page fails to load after remaining on the Grant Application Form for an extended period, while other pages function normally. A manual browser refresh is required to load the page."
+        qa_comment = "Client-side route navigation freeze or component state lock in Grant Application Form preventing transition to Users page."
+
+    # Pattern B: Dashboard count zero / missing
+    elif ("dash" in text_lower or "dashboard" in text_lower) and any(w in text_lower for w in ["zero", "0", "missing", "not showing", "dekha jacce na", "deka jacce na", "ashche na"]):
+        module = "Applicant Portal > Dashboard"
         title = "Verify that Applicant Dashboard reflects total submitted application count"
         scenario = "Verify real-time data synchronization between submitted applications and Dashboard metrics counter."
         test_data = "Applicant account with active submitted application(s)"
@@ -273,8 +285,9 @@ Respond with ONLY valid JSON:
         actual = "The Dashboard counter displays 0 applications despite an active submitted application existing under the applicant account."
         qa_comment = "Data aggregation failure. The dashboard metrics endpoint returns 0 or fails to query the applicant's submission records."
 
-    # Pattern B: Form Builder / Dynamic Field synchronization defect
+    # Pattern C: Form Builder / Dynamic Field synchronization defect
     elif any(w in text_lower for w in ["form", "builder", "field", "schema", "tab", "project information"]):
+        module = "Super Admin > Grant Application Form"
         title = f"Verify dynamic form fields created in {module} render on client portal"
         scenario = f"Verify end-to-end synchronization between Form Builder schema configuration and user-facing submission forms."
         test_data = "Configured form schema and custom fields under Project Information"
@@ -283,7 +296,7 @@ Respond with ONLY valid JSON:
         actual = "Configured fields from the Form Builder do not render on the applicant portal. The form continues to display static default fields."
         qa_comment = "Dynamic form schema is not synchronized or fetched by the client-side application create endpoint."
 
-    # Pattern C: Delete operation failure / 404 / 500 error
+    # Pattern D: Delete operation failure / 404 / 500 error
     elif "delete" in text_lower:
         title = f"Verify Delete functionality in {module}"
         scenario = f"Verify that an authorized user can successfully delete an existing record in {module} without server errors."
@@ -293,7 +306,7 @@ Respond with ONLY valid JSON:
         actual = "Clicking the Delete button fails and triggers an unexpected server error or HTTP 404 Not Found response."
         qa_comment = "Backend API error during DELETE request. Verify endpoint route registration and parameter mapping."
 
-    # Pattern D: Validation error / Duplicate values
+    # Pattern E: Validation error / Duplicate values
     elif any(w in text_lower for w in ["duplicate", "sequence", "unique", "validation"]):
         title = f"Verify uniqueness and field validation in {module}"
         scenario = f"Verify that the system enforces uniqueness and prevents duplicate records in {module}."
@@ -303,42 +316,25 @@ Respond with ONLY valid JSON:
         actual = "The system allows duplicate values to be saved without triggering unique constraint validation."
         qa_comment = "Missing unique validation rule on both frontend form validation and backend database constraints."
 
-    # Pattern E: General fallback with Banglish-to-English translation
-    else:
-        # Translate Banglish words into English
-        cleaned = text_lower
-        dict_map = [
-            ("applicant end a", "on the applicant portal"),
-            ("admin end a", "on the admin portal"),
-            ("dash a", "on the dashboard"),
-            ("zero dekay", "displays 0"),
-            ("0 dekay", "displays 0"),
-            ("deka jacce na", "is not visible"),
-            ("dekha jacche na", "is not visible"),
-            ("ashche na", "does not appear"),
-            ("click korle", "upon clicking"),
-            ("delete hocche na", "cannot be deleted"),
-            ("save hocche na", "cannot be saved"),
-            ("kaj kore na", "does not function properly"),
-            ("blank page", "displays a blank page"),
-            ("error ashe", "throws an error message"),
-            ("500 error", "throws 500 Internal Server Error"),
-            ("404 not found", "returns 404 Not Found"),
-            ("akta", "a"),
-            ("kintu", "however"),
-            ("tobe", "however"),
-        ]
-        for b_word, e_word in dict_map:
-            cleaned = cleaned.replace(b_word, e_word)
-        cleaned = re.sub(r"[^\x00-\x7F]+", " ", cleaned).strip()
+    # Pattern F: Button unresponsive / Nothing happens
+    elif any(w in text_lower for w in ["kichu hoy na", "kaj kore na", "response nai", "unresponsive"]):
+        title = f"Verify user action triggers expected response in {module}"
+        scenario = f"Verify that user interaction on designated controls in {module} successfully triggers the corresponding operation."
+        test_data = "Standard interaction event"
+        steps = f"1. Navigate to {module}.\n2. Trigger the primary action or submit button.\n3. Observe system behavior."
+        expected = "The system should execute the action promptly and display proper feedback or status updates."
+        actual = "The action is completely unresponsive; clicking the button fails to trigger any network request or UI confirmation."
+        qa_comment = "Unbound event listener, unhandled promise rejection, or disabled button state in frontend code."
 
-        title = f"Verify application behavior in {module}"
-        scenario = f"Functional defect verification for {module}"
+    # Pattern G: General clean fallback (STRICTLY NO BANGLISH!)
+    else:
+        title = f"Verify functional workflow in {module}"
+        scenario = f"Verify functional stability and user interactions in {module}"
         test_data = "Standard application user data"
         steps = f"1. Log in to the application.\n2. Navigate to {module}.\n3. Perform the designated user action.\n4. Observe system response."
         expected = "The system should perform the requested action smoothly according to business requirements."
-        actual = f"The action failed during execution: {cleaned.capitalize() if cleaned else 'Unexpected error occurred.'}"
-        qa_comment = "Defect observed during QA manual exploratory testing."
+        actual = f"The expected functional operation in {module} failed during execution. An unexpected defect occurred."
+        qa_comment = "Functional defect observed during manual exploratory QA testing. Developer investigation required."
 
     return {
         "module": module,
