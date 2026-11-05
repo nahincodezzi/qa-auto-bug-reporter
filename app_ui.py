@@ -12,6 +12,8 @@ from main import (
     upload_image_bytes,
     convert_problem_to_qa_report,
     append_to_bug_report,
+    delete_columns_from_excel,
+    delete_row_from_excel,
     EXCEL_FILE,
     COLUMNS
 )
@@ -19,53 +21,47 @@ from main import (
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024  # 32 MB
 
-def read_all_reports_from_excel(file_path: str = EXCEL_FILE) -> list:
-    """Reads all rows from bug_report.xlsx into a list of dicts."""
+def read_all_reports_from_excel(file_path: str = EXCEL_FILE) -> tuple:
+    """Reads current headers and all rows dynamically from bug_report.xlsx."""
     p = Path(file_path)
     if not p.exists():
-        return []
+        return COLUMNS, []
 
     wb = openpyxl.load_workbook(file_path, data_only=True)
     ws = wb.active
 
-    if ws.max_row < 2:
-        return []
+    if ws.max_row < 1:
+        return COLUMNS, []
+
+    headers = [str(ws.cell(1, c).value or "").strip() for c in range(1, ws.max_column + 1)]
+    while headers and not headers[-1]:
+        headers.pop()
+    if not headers:
+        headers = COLUMNS
 
     reports = []
     for r in range(2, ws.max_row + 1):
-        vals = [ws.cell(row=r, column=c).value for c in range(1, len(COLUMNS) + 1)]
+        vals = [ws.cell(row=r, column=c).value for c in range(1, len(headers) + 1)]
         if not any(vals):
             continue
 
-        reports.append({
-            "tid": str(vals[0] or ""),
-            "module": str(vals[1] or ""),
-            "title": str(vals[2] or ""),
-            "scenario": str(vals[3] or ""),
-            "test_data": str(vals[4] or ""),
-            "steps": str(vals[5] or ""),
-            "expected": str(vals[6] or ""),
-            "actual": str(vals[7] or ""),
-            "status": str(vals[8] or ""),
-            "screenshort": str(vals[9] or ""),
-            "dev_comment": str(vals[10] or ""),
-            "qa_comment": str(vals[11] or ""),
-            "defect_status": str(vals[12] or ""),
-            "dev": str(vals[13] or ""),
-            "dev_comennt": str(vals[14] or "")
-        })
+        row_dict = {
+            "row_num": r,
+            "cells": [str(v) if v is not None else "" for v in vals]
+        }
+        reports.append(row_dict)
 
-    return reports
+    return headers, reports
 
 @app.route("/")
 def index():
-    reports = read_all_reports_from_excel()
-    return render_template("index.html", reports=reports)
+    headers, reports = read_all_reports_from_excel()
+    return render_template("index.html", headers=headers, reports=reports)
 
 @app.route("/api/reports", methods=["GET"])
 def api_reports():
-    reports = read_all_reports_from_excel()
-    return jsonify({"success": True, "reports": reports})
+    headers, reports = read_all_reports_from_excel()
+    return jsonify({"success": True, "headers": headers, "reports": reports})
 
 @app.route("/api/add_bug", methods=["POST"])
 def api_add_bug():
@@ -116,13 +112,63 @@ def api_add_bug():
     except Exception as e:
         return jsonify({"success": False, "error": f"Failed to save to Excel: {e}"}), 500
 
-    reports = read_all_reports_from_excel()
+    reports = read_all_reports_from_excel()[1]
+    headers, reports = read_all_reports_from_excel()
     return jsonify({
         "success": True,
         "tid": tid,
         "data": qa_data,
+        "headers": headers,
         "reports": reports
     })
+
+@app.route("/api/delete_columns", methods=["POST"])
+def api_delete_columns():
+    data = request.json or {}
+    indices = data.get("column_indices", [])
+    if not indices:
+        return jsonify({"success": False, "error": "No column indices specified."}), 400
+
+    try:
+        updated_headers = delete_columns_from_excel(indices)
+        headers, reports = read_all_reports_from_excel()
+        return jsonify({
+            "success": True,
+            "message": f"Successfully deleted {len(indices)} column(s).",
+            "headers": headers,
+            "reports": reports
+        })
+    except PermissionError as pe:
+        return jsonify({
+            "success": False,
+            "error": "⚠️ 'bug_report.xlsx' is currently open in Microsoft Excel! Please close Excel and try again."
+        }), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/delete_row", methods=["POST"])
+def api_delete_row():
+    data = request.json or {}
+    row_num = data.get("row_num")
+    if not row_num:
+        return jsonify({"success": False, "error": "Row number is required."}), 400
+
+    try:
+        success = delete_row_from_excel(int(row_num))
+        headers, reports = read_all_reports_from_excel()
+        return jsonify({
+            "success": success,
+            "message": f"Row {row_num} deleted.",
+            "headers": headers,
+            "reports": reports
+        })
+    except PermissionError as pe:
+        return jsonify({
+            "success": False,
+            "error": "⚠️ 'bug_report.xlsx' is currently open in Microsoft Excel! Please close Excel and try again."
+        }), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/set_api_key", methods=["POST"])
 def api_set_api_key():

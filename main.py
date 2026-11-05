@@ -383,6 +383,51 @@ def get_next_tid(ws, module: str = "") -> str:
             count += 1
     return f"{prefix}-{str(count + 1).zfill(2)}"
 
+def delete_columns_from_excel(col_indices: list, file_path: str = EXCEL_FILE) -> list:
+    """
+    Deletes specified columns from the Excel file (1-based index).
+    Deletes in descending order to avoid index shifting.
+    """
+    p = Path(file_path)
+    if not p.exists():
+        return []
+
+    wb = openpyxl.load_workbook(file_path)
+    ws = wb.active
+
+    # Sort in descending order
+    sorted_indices = sorted([int(i) for i in col_indices], reverse=True)
+    for idx in sorted_indices:
+        if 1 <= idx <= ws.max_column:
+            ws.delete_cols(idx)
+
+    # Save
+    try:
+        wb.save(file_path)
+    except PermissionError:
+        raise PermissionError(f"'{file_path}' is currently open in Microsoft Excel. Please close Excel and try again!")
+
+    # Return updated headers
+    return [str(ws.cell(1, c).value or "").strip() for c in range(1, ws.max_column + 1) if ws.cell(1, c).value]
+
+def delete_row_from_excel(row_num: int, file_path: str = EXCEL_FILE) -> bool:
+    """Deletes a specific data row from the Excel file (1-based index)."""
+    p = Path(file_path)
+    if not p.exists():
+        return False
+
+    wb = openpyxl.load_workbook(file_path)
+    ws = wb.active
+
+    if 2 <= row_num <= ws.max_row:
+        ws.delete_rows(row_num)
+        try:
+            wb.save(file_path)
+            return True
+        except PermissionError:
+            raise PermissionError(f"'{file_path}' is currently open in Microsoft Excel. Please close Excel and try again!")
+    return False
+
 def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
     """
     Appends a new bug report directly into the single Excel spreadsheet.
@@ -422,24 +467,54 @@ def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
 
     next_row = ws.max_row + 1
 
-    # Map the exact 15 columns
-    values = [
-        tid,
-        bug_dict.get("module", "General"),
-        bug_dict.get("title", ""),
-        bug_dict.get("scenario", ""),
-        bug_dict.get("test_data", "N/A"),
-        bug_dict.get("steps", ""),
-        bug_dict.get("expected", ""),
-        bug_dict.get("actual", ""),
-        bug_dict.get("status", "Fail"),
-        bug_dict.get("screenshort", "-"),
-        bug_dict.get("dev_comment", ""),
-        bug_dict.get("qa_comment", "Logged by QA"),
-        bug_dict.get("defect_status", "New"),
-        bug_dict.get("dev", "Unassigned"),
-        bug_dict.get("dev_comennt", "")
-    ]
+    # Read active headers from row 1 of the sheet
+    headers = [str(ws.cell(1, c).value or "").strip() for c in range(1, ws.max_column + 1)]
+    while headers and not headers[-1]:
+        headers.pop()
+    if not headers:
+        headers = COLUMNS
+
+    # Build values dynamically according to active headers
+    status_count = 0
+    values = []
+    header_names = []
+    for c_idx, h in enumerate(headers, 1):
+        hn = h.strip()
+        header_names.append(hn)
+        if hn == "TID":
+            values.append(tid)
+        elif hn == "Module":
+            values.append(bug_dict.get("module", "General"))
+        elif hn == "Test Case Title":
+            values.append(bug_dict.get("title", ""))
+        elif hn == "Test Scenario":
+            values.append(bug_dict.get("scenario", ""))
+        elif hn == "Test Data":
+            values.append(bug_dict.get("test_data", "N/A"))
+        elif hn == "Test Step":
+            values.append(bug_dict.get("steps", ""))
+        elif hn == "Expected Result":
+            values.append(bug_dict.get("expected", ""))
+        elif hn == "Actual Result":
+            values.append(bug_dict.get("actual", ""))
+        elif hn == "Screenshort":
+            values.append(bug_dict.get("screenshort", "-"))
+        elif hn == "Dev Comment":
+            values.append(bug_dict.get("dev_comment", ""))
+        elif hn == "QA Comment":
+            values.append(bug_dict.get("qa_comment", "Logged by QA"))
+        elif hn == "Status":
+            status_count += 1
+            if status_count == 1:
+                values.append(bug_dict.get("status", "Fail"))
+            else:
+                values.append(bug_dict.get("defect_status", "New"))
+        elif hn == "Dev":
+            values.append(bug_dict.get("dev", "Unassigned"))
+        elif "Dev Com" in hn:
+            values.append(bug_dict.get("dev_comennt", ""))
+        else:
+            values.append(bug_dict.get(hn, ""))
 
     thin_border = Border(
         left=Side(style="thin", color="D1D5DB"),
@@ -449,7 +524,7 @@ def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
     )
     zebra_fill = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid") if next_row % 2 == 0 else PatternFill(fill_type=None)
 
-    for col_idx, val in enumerate(values, start=1):
+    for col_idx, (hn, val) in enumerate(zip(header_names, values), start=1):
         cell = ws.cell(row=next_row, column=col_idx)
         cell.value = val
         cell.border = thin_border
@@ -458,19 +533,26 @@ def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
         cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=True)
 
         # Highlight Status columns
-        if col_idx == 9:  # Status (Execution)
-            cell.fill = PatternFill(start_color="FDE8E8", end_color="FDE8E8", fill_type="solid")
-            cell.font = Font(name="Segoe UI", size=10, bold=True, color="9B1C1C")
-            cell.alignment = Alignment(horizontal="center", vertical="top")
-        elif col_idx == 13:  # Status (Defect)
-            cell.fill = PatternFill(start_color="FEF08A", end_color="FEF08A", fill_type="solid")
-            cell.font = Font(name="Segoe UI", size=10, bold=True, color="713F12")
-            cell.alignment = Alignment(horizontal="center", vertical="top")
-        elif col_idx == 10:  # Screenshot Link
+        if hn == "Status":
+            if str(val).lower() in ["fail", "bug", "blocked"]:
+                cell.fill = PatternFill(start_color="FDE8E8", end_color="FDE8E8", fill_type="solid")
+                cell.font = Font(name="Segoe UI", size=10, bold=True, color="9B1C1C")
+                cell.alignment = Alignment(horizontal="center", vertical="top")
+            elif str(val).lower() in ["new", "open", "in progress"]:
+                cell.fill = PatternFill(start_color="FEF08A", end_color="FEF08A", fill_type="solid")
+                cell.font = Font(name="Segoe UI", size=10, bold=True, color="713F12")
+                cell.alignment = Alignment(horizontal="center", vertical="top")
+            elif str(val).lower() in ["pass", "passed", "resolved", "closed"]:
+                cell.fill = PatternFill(start_color="D1FAE5", end_color="D1FAE5", fill_type="solid")
+                cell.font = Font(name="Segoe UI", size=10, bold=True, color="065F46")
+                cell.alignment = Alignment(horizontal="center", vertical="top")
+
+        elif hn == "Screenshort":
             if str(val).startswith("http"):
                 cell.hyperlink = val
                 cell.font = Font(name="Segoe UI", size=10, color="0B69A3", underline="single")
-        elif col_idx in (1, 14):
+
+        elif hn in ("TID", "Dev"):
             cell.alignment = Alignment(horizontal="center", vertical="top")
 
     # Dynamic row height based on content lines (especially multiple screenshots & steps)

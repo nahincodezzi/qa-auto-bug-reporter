@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QA Bug Reporter Pro | Full 15-Column Defect Manager</title>
+    <title>QA Bug Reporter Pro | Dynamic Column & Defect Manager</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -77,7 +77,7 @@
 
         /* Container */
         .container {
-            max-width: 1440px;
+            max-width: 1480px;
             margin: 24px auto;
             padding: 0 24px;
             display: flex;
@@ -274,41 +274,16 @@
             text-decoration: none;
             transition: all 0.15s ease;
         }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-hover);
-        }
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .btn-success:hover:not(:disabled) {
-            background: var(--success-hover);
-        }
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border);
-            color: var(--text-main);
-        }
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        .btn-lg {
-            padding: 14px 28px;
-            font-size: 15px;
-            width: 100%;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover:not(:disabled) { background: var(--success-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border-color: var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-lg { padding: 14px 28px; font-size: 15px; width: 100%; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* Progress Box */
         .progress-box {
@@ -330,28 +305,19 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .progress-text strong {
-            display: block;
-            font-size: 14px;
-            color: #1e3a8a;
-        }
-        .progress-text span {
-            font-size: 12px;
-            color: #3b82f6;
-        }
 
-        /* Full 15-Column Spreadsheet Table */
+        /* Dynamic Table */
         .table-responsive {
             overflow-x: auto;
-            max-height: 520px;
+            max-height: 540px;
             border: 1px solid var(--border);
         }
         .report-table {
             width: 100%;
-            min-width: 2200px; /* Ensures all 15 columns breathe cleanly */
             border-collapse: collapse;
             font-size: 12.5px;
             text-align: left;
+            min-width: 1600px;
         }
         .report-table thead th {
             background: #1e3a8a;
@@ -364,6 +330,31 @@
             z-index: 10;
             border-right: 1px solid #2e4a9e;
         }
+        .th-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .th-del-btn {
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: opacity 0.15s, background 0.15s;
+        }
+        .th-del-btn:hover {
+            opacity: 1;
+            background: #ef4444;
+        }
         .report-table td {
             padding: 12px 14px;
             border-bottom: 1px solid var(--border);
@@ -371,12 +362,8 @@
             vertical-align: top;
             background: #ffffff;
         }
-        .report-table tbody tr:nth-child(even) td {
-            background: #f8fafc;
-        }
-        .report-table tbody tr:hover td {
-            background: #f1f5f9;
-        }
+        .report-table tbody tr:nth-child(even) td { background: #f8fafc; }
+        .report-table tbody tr:hover td { background: #f1f5f9; }
 
         .tid-badge {
             font-family: 'JetBrains Mono', monospace;
@@ -400,12 +387,7 @@
         .status-pass { background: #d1fae5; color: #065f46; }
         .status-new { background: #fef3c7; color: #92400e; }
 
-        /* Link Buttons & Chips */
-        .link-chips {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .link-chips { display: flex; flex-direction: column; gap: 4px; }
         .link-chip {
             display: inline-flex;
             align-items: center;
@@ -421,10 +403,7 @@
             white-space: nowrap;
             width: fit-content;
         }
-        .link-chip:hover {
-            background: #dbeafe;
-            text-decoration: underline;
-        }
+        .link-chip:hover { background: #dbeafe; text-decoration: underline; }
 
         .cell-pre {
             white-space: pre-wrap;
@@ -432,16 +411,56 @@
             min-width: 180px;
             max-width: 280px;
         }
-        .cell-steps {
-            min-width: 220px;
-            max-width: 320px;
+        .cell-actual { color: #991b1b; font-weight: 500; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.65);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .cell-actual {
-            color: #991b1b;
-            font-weight: 500;
-            min-width: 200px;
-            max-width: 300px;
+        .modal-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 540px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
         }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .columns-list {
+            max-height: 320px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .column-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .column-checkbox-item:hover { background: #eff6ff; }
+        .column-checkbox-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
 
         /* Toast */
         .toast {
@@ -457,33 +476,16 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.25s ease;
-            z-index: 1000;
+            z-index: 3000;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateY(0); }
 
         .search-box {
             padding: 6px 12px;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             font-size: 13px;
-            width: 260px;
-        }
-        .search-box:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .scroll-hint {
-            font-size: 11px;
-            color: #2563eb;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-weight: 500;
+            width: 240px;
         }
     </style>
 </head>
@@ -495,11 +497,11 @@
             <span class="nav-logo">🐞</span>
             <div>
                 <h1>QA Bug Reporter Pro</h1>
-                <span>Banglish/English &rarr; 100% Professional QA English &rarr; Full 15-Column Excel</span>
+                <span>Banglish/English &rarr; 100% Professional QA English &rarr; Excel Automation</span>
             </div>
         </div>
         <div class="nav-actions">
-            <button id="btnApiKey" class="btn btn-sm btn-outline" style="color: white; border-color: #475569;" title="Set Google Gemini AI Key for vision analysis">
+            <button id="btnApiKey" class="btn btn-sm btn-outline" style="color: white; border-color: #475569;" title="Set Google Gemini AI Key">
                 <span>🔑 AI Key (Optional)</span>
             </button>
             <button id="btnOpenExcel" class="btn btn-success" title="Open the Excel file directly in Microsoft Excel">
@@ -528,7 +530,6 @@
                                 <span id="ssCounterBadge" style="font-size: 11px; font-weight: 600; color: #2563eb; display: none;">0 Attached</span>
                             </div>
                             
-                            <!-- Hidden input supporting MULTIPLE files -->
                             <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
                             
                             <div class="drop-zone" id="dropZone">
@@ -537,7 +538,6 @@
                                 <span class="pill-badge">💡 Tip: Press Ctrl + V to paste screenshots directly!</span>
                             </div>
 
-                            <!-- Attached Images Gallery -->
                             <div class="gallery-wrapper" id="galleryWrapper" style="display: none;">
                                 <div class="gallery-header">
                                     <span id="galleryCountText">Attached Screenshots:</span>
@@ -566,104 +566,85 @@
                         <div class="spinner"></div>
                         <div class="progress-text">
                             <strong id="progressTitle">Uploading screenshots to cloud...</strong>
-                            <span id="progressSub">Converting Banglish to 100% Professional QA English and populating all 15 Excel columns...</span>
+                            <span id="progressSub">Converting Banglish to 100% Professional QA English and populating Excel columns...</span>
                         </div>
                     </div>
                 </form>
             </div>
         </section>
 
-        <!-- Full 15-Column Existing Reports Table -->
+        <!-- Dynamic Column Spreadsheet Table -->
         <section class="card">
             <div class="card-header">
                 <div>
                     <h2>Excel Bug Reports (<span id="totalBugsCount">{{ reports|length }}</span> Defects Logged)</h2>
-                    <span style="font-size: 12px; color: #64748b;">File: <strong>bug_report.xlsx</strong> &bull; Exact 15 Columns Displayed Below</span>
+                    <span style="font-size: 12px; color: #64748b;">File: <strong>bug_report.xlsx</strong> &bull; <span id="colCountText">{{ headers|length }}</span> Columns Active</span>
                 </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <span class="scroll-hint">&larr; Scroll horizontally to view all 15 columns &rarr;</span>
-                    <input type="text" id="searchTable" class="search-box" placeholder="🔍 Search any column..." />
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" class="btn btn-sm btn-outline" id="btnManageColumns" style="color: #b91c1c; border-color: #fca5a5; font-weight: 600;">
+                        <span>🗑️ Select & Delete Columns</span>
+                    </button>
+                    <input type="text" id="searchTable" class="search-box" placeholder="🔍 Search bugs..." />
                     <button type="button" class="btn btn-sm btn-outline" id="btnRefresh">🔄 Refresh</button>
                 </div>
             </div>
             <div class="card-body" style="padding: 0;">
                 <div class="table-responsive">
                     <table class="report-table" id="reportTable">
-                        <thead>
+                        <thead id="reportTableHead">
                             <tr>
-                                <th style="width: 100px;">1. TID</th>
-                                <th style="width: 180px;">2. Module</th>
-                                <th style="width: 250px;">3. Test Case Title</th>
-                                <th style="width: 240px;">4. Test Scenario</th>
-                                <th style="width: 160px;">5. Test Data</th>
-                                <th style="width: 260px;">6. Test Step</th>
-                                <th style="width: 240px;">7. Expected Result</th>
-                                <th style="width: 250px;">8. Actual Result</th>
-                                <th style="width: 100px;">9. Status</th>
-                                <th style="width: 200px;">10. Screenshort</th>
-                                <th style="width: 140px;">11. Dev Comment</th>
-                                <th style="width: 240px;">12. QA Comment</th>
-                                <th style="width: 120px;">13. Status (Defect)</th>
-                                <th style="width: 140px;">14. Dev</th>
-                                <th style="width: 140px;">15. Dev Comennt</th>
+                                {% for h in headers %}
+                                <th>
+                                    <div class="th-content">
+                                        <span>{{ loop.index }}. {{ h }}</span>
+                                        <button type="button" class="th-del-btn" title="Delete column '{{ h }}'" onclick="deleteSingleColumn({{ loop.index }}, '{{ h }}')">✕</button>
+                                    </div>
+                                </th>
+                                {% endfor %}
+                                <th style="width: 80px; text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="reportTableBody">
                             {% for r in reports %}
-                            <tr>
-                                <!-- 1. TID -->
-                                <td><span class="tid-badge">{{ r.tid }}</span></td>
-                                <!-- 2. Module -->
-                                <td><strong>{{ r.module }}</strong></td>
-                                <!-- 3. Title -->
-                                <td>{{ r.title }}</td>
-                                <!-- 4. Scenario -->
-                                <td class="cell-pre">{{ r.scenario }}</td>
-                                <!-- 5. Test Data -->
-                                <td>{{ r.test_data }}</td>
-                                <!-- 6. Test Step -->
-                                <td class="cell-pre cell-steps">{{ r.steps }}</td>
-                                <!-- 7. Expected Result -->
-                                <td class="cell-pre">{{ r.expected }}</td>
-                                <!-- 8. Actual Result -->
-                                <td class="cell-pre cell-actual">{{ r.actual }}</td>
-                                <!-- 9. Status (Execution) -->
-                                <td style="text-align: center;">
-                                    <span class="status-badge status-{{ (r.status or 'fail')|lower }}">{{ r.status }}</span>
-                                </td>
-                                <!-- 10. Screenshort -->
-                                <td>
-                                    <div class="link-chips">
-                                        {% if r.screenshort and 'http' in r.screenshort %}
-                                            {% for line in r.screenshort.split('\n') %}
-                                                {% if 'http' in line %}
-                                                    {% set parts = line.split('http') %}
-                                                    {% set label = parts[0].replace(':', '').strip() or 'View SS' %}
-                                                    {% set url = 'http' + parts[1].strip() %}
-                                                    <a href="{{ url }}" target="_blank" class="link-chip">🔗 {{ label }}</a>
+                            <tr data-row-num="{{ r.row_num }}">
+                                {% for val in r.cells %}
+                                    {% set h_name = headers[loop.index0] if loop.index0 < headers|length else '' %}
+                                    {% if h_name == 'TID' %}
+                                        <td><span class="tid-badge">{{ val }}</span></td>
+                                    {% elif h_name == 'Status' %}
+                                        <td style="text-align: center;">
+                                            <span class="status-badge status-{{ (val or 'fail')|lower }}">{{ val }}</span>
+                                        </td>
+                                    {% elif h_name == 'Screenshort' %}
+                                        <td>
+                                            <div class="link-chips">
+                                                {% if val and 'http' in val %}
+                                                    {% for line in val.split('\n') %}
+                                                        {% if 'http' in line %}
+                                                            {% set parts = line.split('http') %}
+                                                            {% set label = parts[0].replace(':', '').strip() or 'View SS' %}
+                                                            {% set url = 'http' + parts[1].strip() %}
+                                                            <a href="{{ url }}" target="_blank" class="link-chip">🔗 {{ label }}</a>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span style="color: #94a3b8;">-</span>
                                                 {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            <span style="color: #94a3b8;">-</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <!-- 11. Dev Comment -->
-                                <td style="color: #64748b;">{{ r.dev_comment or '-' }}</td>
-                                <!-- 12. QA Comment -->
-                                <td class="cell-pre" style="font-size: 12px; color: #334155;">{{ r.qa_comment }}</td>
-                                <!-- 13. Status (Defect) -->
+                                            </div>
+                                        </td>
+                                    {% elif h_name == 'Actual Result' %}
+                                        <td class="cell-pre cell-actual">{{ val }}</td>
+                                    {% else %}
+                                        <td class="cell-pre">{{ val or '-' }}</td>
+                                    {% endif %}
+                                {% endfor %}
                                 <td style="text-align: center;">
-                                    <span class="status-badge status-new">{{ r.defect_status }}</span>
+                                    <button type="button" class="btn btn-sm btn-outline" style="color: #dc2626; padding: 4px 8px;" title="Delete this defect row" onclick="deleteRow({{ r.row_num }})">🗑️</button>
                                 </td>
-                                <!-- 14. Dev -->
-                                <td style="text-align: center;">{{ r.dev }}</td>
-                                <!-- 15. Dev Comennt -->
-                                <td style="color: #64748b;">{{ r.dev_comennt or '-' }}</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="15" style="text-align: center; color: #94a3b8; padding: 40px;">
+                                <td colspan="{{ headers|length + 1 }}" style="text-align: center; color: #94a3b8; padding: 40px;">
                                     No bug reports logged yet. Add your first bug above!
                                 </td>
                             </tr>
@@ -675,15 +656,41 @@
         </section>
     </main>
 
-    <!-- API Key Modal -->
-    <div id="apiKeyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center;">
-        <div style="background: white; border-radius: 12px; width: 90%; max-width: 480px; padding: 24px; box-shadow: var(--shadow-lg);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <!-- Modal: Select & Delete Columns -->
+    <div class="modal-overlay" id="columnModal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a;">🗑️ Select Columns to Delete</h3>
+                <button type="button" id="btnCloseColModal" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b;">✕</button>
+            </div>
+            <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+                Check the columns you want to permanently delete from <strong>bug_report.xlsx</strong>:
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="font-size: 12px; font-weight: 600; cursor: pointer;">
+                    <input type="checkbox" id="chkSelectAllCols" /> Select All
+                </label>
+                <span id="selectedColsCount" style="font-size: 12px; color: #2563eb; font-weight: 600;">0 Selected</span>
+            </div>
+            <div class="columns-list" id="columnsListContainer"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-outline" id="btnCancelColModal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmDeleteCols" disabled>
+                    <span>🗑️ Delete Selected Columns</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: API Key -->
+    <div class="modal-overlay" id="apiKeyModal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
                 <h3 style="font-size: 16px; font-weight: 700;">🔑 Google Gemini AI Key (Optional)</h3>
                 <button type="button" id="btnCloseApiKeyModal" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b;">✕</button>
             </div>
             <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">
-                Gemini Vision AI can inspect your screenshots visually and automatically write the entire QA report.
+                Gemini Vision AI can visually inspect your screenshots and generate customized QA steps.
                 <br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #2563eb; text-decoration: underline;">Get a 100% Free Gemini API key here &rarr;</a>
             </p>
             <input type="password" id="inputApiKeyVal" class="form-textarea" style="min-height: 44px; height: 44px; padding: 10px; margin-bottom: 16px;" placeholder="AIzaSy..." />
@@ -698,8 +705,12 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // State
+        let currentHeaders = {{ headers|tojson }};
+        let currentReports = {{ reports|tojson }};
         let selectedFiles = [];
 
+        // DOM elements
         const dropZone = document.getElementById("dropZone");
         const fileInput = document.getElementById("fileInput");
         const galleryWrapper = document.getElementById("galleryWrapper");
@@ -713,12 +724,32 @@
         const progressBox = document.getElementById("progressBox");
         const progressTitle = document.getElementById("progressTitle");
         const progressSub = document.getElementById("progressSub");
+        const reportTableHead = document.getElementById("reportTableHead");
         const reportTableBody = document.getElementById("reportTableBody");
         const totalBugsCount = document.getElementById("totalBugsCount");
+        const colCountText = document.getElementById("colCountText");
         const searchTable = document.getElementById("searchTable");
         const btnOpenExcel = document.getElementById("btnOpenExcel");
         const btnRefresh = document.getElementById("btnRefresh");
         const toast = document.getElementById("toast");
+
+        // Column Management elements
+        const btnManageColumns = document.getElementById("btnManageColumns");
+        const columnModal = document.getElementById("columnModal");
+        const btnCloseColModal = document.getElementById("btnCloseColModal");
+        const btnCancelColModal = document.getElementById("btnCancelColModal");
+        const btnConfirmDeleteCols = document.getElementById("btnConfirmDeleteCols");
+        const columnsListContainer = document.getElementById("columnsListContainer");
+        const chkSelectAllCols = document.getElementById("chkSelectAllCols");
+        const selectedColsCount = document.getElementById("selectedColsCount");
+
+        // API Key elements
+        const btnApiKey = document.getElementById("btnApiKey");
+        const apiKeyModal = document.getElementById("apiKeyModal");
+        const btnCloseApiKeyModal = document.getElementById("btnCloseApiKeyModal");
+        const btnCancelApiKey = document.getElementById("btnCancelApiKey");
+        const btnSaveApiKey = document.getElementById("btnSaveApiKey");
+        const inputApiKeyVal = document.getElementById("inputApiKeyVal");
 
         function showToast(msg) {
             toast.textContent = msg;
@@ -726,7 +757,7 @@
             setTimeout(() => toast.classList.remove("show"), 3500);
         }
 
-        // Add 1 or multiple files to gallery
+        // Multi-Image Handling
         function addFiles(filesList) {
             let addedCount = 0;
             for (let file of filesList) {
@@ -741,7 +772,6 @@
             }
         }
 
-        // Render multi-image thumbnail gallery
         function renderGallery() {
             galleryGrid.innerHTML = "";
             if (selectedFiles.length === 0) {
@@ -786,18 +816,13 @@
             });
         }
 
-        function clearAllScreenshots() {
+        btnClearAllSS.addEventListener("click", () => {
             selectedFiles = [];
             fileInput.value = "";
             renderGallery();
-        }
-
-        btnClearAllSS.addEventListener("click", clearAllScreenshots);
-
-        dropZone.addEventListener("click", () => {
-            fileInput.click();
         });
 
+        dropZone.addEventListener("click", () => fileInput.click());
         fileInput.addEventListener("change", (e) => {
             if (e.target.files && e.target.files.length > 0) {
                 addFiles(e.target.files);
@@ -805,7 +830,6 @@
             }
         });
 
-        // Drag & Drop multiple files
         ["dragenter", "dragover"].forEach(name => {
             dropZone.addEventListener(name, (e) => {
                 e.preventDefault();
@@ -826,7 +850,7 @@
             }
         });
 
-        // Global Paste (Ctrl + V) - Supports pasting multiple screenshots
+        // Global Paste (Ctrl + V)
         window.addEventListener("paste", (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             const pastedImages = [];
@@ -841,7 +865,7 @@
             }
         });
 
-        // Submit Form
+        // Submit New Bug
         bugForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const text = problemDesc.value.trim();
@@ -849,17 +873,17 @@
 
             btnSubmit.disabled = true;
             progressBox.style.display = "flex";
-            progressTitle.textContent = selectedFiles.length > 0 
-                ? `☁️ Uploading ${selectedFiles.length} screenshot(s) to cloud...`
-                : "🧠 Translating Banglish to 100% Professional QA English...";
-            progressSub.textContent = "Writing to all 15 columns in bug_report.xlsx...";
+            if (selectedFiles.length > 0) {
+                progressTitle.textContent = `☁️ Uploading ${selectedFiles.length} screenshot(s) to cloud...`;
+                progressSub.textContent = "Converting Banglish to 100% Professional QA English and populating all columns...";
+            } else {
+                progressTitle.textContent = "🧠 Translating Banglish to 100% Professional QA English...";
+                progressSub.textContent = "Writing bug report to Excel...";
+            }
 
             const formData = new FormData();
             formData.append("problem", text);
-
-            selectedFiles.forEach((file) => {
-                formData.append("images", file);
-            });
+            selectedFiles.forEach((file) => formData.append("images", file));
 
             try {
                 const res = await fetch("/api/add_bug", {
@@ -873,13 +897,15 @@
                 }
 
                 showToast(`🎉 Saved [${result.tid}] to bug_report.xlsx in Professional English!`);
-                updateTable(result.reports);
+                updateTable(result.headers, result.reports);
 
                 problemDesc.value = "";
-                clearAllScreenshots();
+                selectedFiles = [];
+                renderGallery();
 
             } catch (err) {
-                alert("Error: " + err.message);
+                alert(err.message);
+                showToast(err.message);
             } finally {
                 btnSubmit.disabled = false;
                 progressBox.style.display = "none";
@@ -904,60 +930,182 @@
             return `<div class="link-chips">${chipsHtml}</div>`;
         }
 
-        // Dynamically update the full 15-column table
-        function updateTable(reports) {
+        // Dynamically update the entire table (all columns)
+        function updateTable(headers, reports) {
+            currentHeaders = headers;
+            currentReports = reports;
             totalBugsCount.textContent = reports.length;
+            colCountText.textContent = headers.length;
+
+            // Render Header
+            let thHtml = headers.map((h, idx) => `
+                <th>
+                    <div class="th-content">
+                        <span>${idx + 1}. ${escapeHtml(h)}</span>
+                        <button type="button" class="th-del-btn" title="Delete column '${escapeHtml(h)}'" onclick="deleteSingleColumn(${idx + 1}, '${escapeHtml(h)}')">✕</button>
+                    </div>
+                </th>
+            `).join("");
+            thHtml += `<th style="width: 80px; text-align: center;">Action</th>`;
+            reportTableHead.innerHTML = `<tr>${thHtml}</tr>`;
+
+            // Render Body
             if (!reports || reports.length === 0) {
-                reportTableBody.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #94a3b8; padding: 40px;">No bug reports logged yet.</td></tr>`;
+                reportTableBody.innerHTML = `<tr><td colspan="${headers.length + 1}" style="text-align: center; color: #94a3b8; padding: 40px;">No bug reports logged yet.</td></tr>`;
                 return;
             }
 
-            reportTableBody.innerHTML = reports.map(r => `
-                <tr>
-                    <!-- 1. TID -->
-                    <td><span class="tid-badge">${escapeHtml(r.tid)}</span></td>
-                    <!-- 2. Module -->
-                    <td><strong>${escapeHtml(r.module)}</strong></td>
-                    <!-- 3. Title -->
-                    <td>${escapeHtml(r.title)}</td>
-                    <!-- 4. Scenario -->
-                    <td class="cell-pre">${escapeHtml(r.scenario)}</td>
-                    <!-- 5. Test Data -->
-                    <td>${escapeHtml(r.test_data || 'N/A')}</td>
-                    <!-- 6. Test Step -->
-                    <td class="cell-pre cell-steps">${escapeHtml(r.steps)}</td>
-                    <!-- 7. Expected Result -->
-                    <td class="cell-pre">${escapeHtml(r.expected)}</td>
-                    <!-- 8. Actual Result -->
-                    <td class="cell-pre cell-actual">${escapeHtml(r.actual)}</td>
-                    <!-- 9. Status (Execution) -->
-                    <td style="text-align: center;">
-                        <span class="status-badge status-${(r.status || 'fail').toLowerCase()}">${escapeHtml(r.status)}</span>
-                    </td>
-                    <!-- 10. Screenshort -->
-                    <td>${renderScreenshotsHtml(r.screenshort)}</td>
-                    <!-- 11. Dev Comment -->
-                    <td style="color: #64748b;">${escapeHtml(r.dev_comment || '-')}</td>
-                    <!-- 12. QA Comment -->
-                    <td class="cell-pre" style="font-size: 12px; color: #334155;">${escapeHtml(r.qa_comment)}</td>
-                    <!-- 13. Status (Defect) -->
-                    <td style="text-align: center;">
-                        <span class="status-badge status-new">${escapeHtml(r.defect_status || 'New')}</span>
-                    </td>
-                    <!-- 14. Dev -->
-                    <td style="text-align: center;">${escapeHtml(r.dev || 'Unassigned')}</td>
-                    <!-- 15. Dev Comennt -->
-                    <td style="color: #64748b;">${escapeHtml(r.dev_comennt || '-')}</td>
-                </tr>
-            `).join("");
+            reportTableBody.innerHTML = reports.map(r => {
+                const cellList = r.cells || r.values || [];
+                let tds = cellList.map((val, idx) => {
+                    const h_name = headers[idx] || "";
+                    if (h_name === "TID") {
+                        return `<td><span class="tid-badge">${escapeHtml(val)}</span></td>`;
+                    } else if (h_name === "Status") {
+                        return `<td style="text-align: center;"><span class="status-badge status-${(val || 'fail').toLowerCase()}">${escapeHtml(val)}</span></td>`;
+                    } else if (h_name === "Screenshort") {
+                        return `<td>${renderScreenshotsHtml(val)}</td>`;
+                    } else if (h_name === "Actual Result") {
+                        return `<td class="cell-pre cell-actual">${escapeHtml(val)}</td>`;
+                    } else {
+                        return `<td class="cell-pre">${escapeHtml(val || '-')}</td>`;
+                    }
+                }).join("");
+
+                tds += `<td style="text-align: center;"><button type="button" class="btn btn-sm btn-outline" style="color: #dc2626; padding: 4px 8px;" title="Delete this defect row" onclick="deleteRow(${r.row_num})">🗑️</button></td>`;
+                return `<tr data-row-num="${r.row_num}">${tds}</tr>`;
+            }).join("");
         }
 
         function escapeHtml(s) {
             if (!s) return "";
-            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
         }
 
-        // Search Filter across all 15 columns
+        // =========================================================================
+        // 🛠️ COLUMN DELETION & MANAGEMENT MODAL
+        // =========================================================================
+        btnManageColumns.addEventListener("click", () => {
+            renderColumnCheckboxes();
+            columnModal.style.display = "flex";
+        });
+
+        const closeColModal = () => { columnModal.style.display = "none"; };
+        btnCloseColModal.addEventListener("click", closeColModal);
+        btnCancelColModal.addEventListener("click", closeColModal);
+
+        function renderColumnCheckboxes() {
+            columnsListContainer.innerHTML = currentHeaders.map((h, idx) => `
+                <label class="column-checkbox-item">
+                    <input type="checkbox" class="col-chk" data-col-index="${idx + 1}" data-col-name="${escapeHtml(h)}" onchange="onColumnCheckboxChange()" />
+                    <span><strong>Column ${idx + 1}:</strong> ${escapeHtml(h)}</span>
+                </label>
+            `).join("");
+            chkSelectAllCols.checked = false;
+            updateColCount();
+        }
+
+        chkSelectAllCols.addEventListener("change", (e) => {
+            const chks = columnsListContainer.querySelectorAll(".col-chk");
+            chks.forEach(c => c.checked = e.target.checked);
+            updateColCount();
+        });
+
+        window.onColumnCheckboxChange = function() {
+            updateColCount();
+        };
+
+        function updateColCount() {
+            const chks = columnsListContainer.querySelectorAll(".col-chk:checked");
+            selectedColsCount.textContent = `${chks.length} Selected`;
+            btnConfirmDeleteCols.disabled = (chks.length === 0);
+        }
+
+        // Delete selected columns
+        btnConfirmDeleteCols.addEventListener("click", async () => {
+            const chks = columnsListContainer.querySelectorAll(".col-chk:checked");
+            const indices = Array.from(chks).map(c => parseInt(c.dataset.colIndex));
+            const names = Array.from(chks).map(c => c.dataset.colName).join(", ");
+
+            if (!confirm(`Are you sure you want to permanently delete these ${indices.length} column(s) from bug_report.xlsx?\n\nColumns: ${names}`)) {
+                return;
+            }
+
+            try {
+                btnConfirmDeleteCols.disabled = true;
+                const res = await fetch("/api/delete_columns", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ column_indices: indices })
+                });
+                const result = await res.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "Failed to delete columns.");
+                }
+
+                showToast(`🗑️ ${result.message}`);
+                updateTable(result.headers, result.reports);
+                closeColModal();
+
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btnConfirmDeleteCols.disabled = false;
+            }
+        });
+
+        // Delete single column directly from header '✕'
+        window.deleteSingleColumn = async function(colIndex, colName) {
+            if (!confirm(`Are you sure you want to delete Column ${colIndex} ('${colName}') from bug_report.xlsx?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/delete_columns", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ column_indices: [colIndex] })
+                });
+                const result = await res.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "Failed to delete column.");
+                }
+
+                showToast(`🗑️ Deleted column '${colName}' successfully!`);
+                updateTable(result.headers, result.reports);
+
+            } catch (err) {
+                alert(err.message);
+            }
+        };
+
+        // Delete Row
+        window.deleteRow = async function(rowNum) {
+            if (!confirm(`Delete defect row ${rowNum} from bug_report.xlsx?`)) return;
+
+            try {
+                const res = await fetch("/api/delete_row", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ row_num: rowNum })
+                });
+                const result = await res.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "Failed to delete row.");
+                }
+
+                showToast(`🗑️ Deleted row from bug_report.xlsx!`);
+                updateTable(result.headers, result.reports);
+
+            } catch (err) {
+                alert(err.message);
+            }
+        };
+
+        // Search Filter
         searchTable.addEventListener("input", (e) => {
             const q = e.target.value.toLowerCase();
             const rows = reportTableBody.querySelectorAll("tr");
@@ -966,53 +1114,15 @@
             });
         });
 
-        // API Key Modal
-        const btnApiKey = document.getElementById("btnApiKey");
-        const apiKeyModal = document.getElementById("apiKeyModal");
-        const btnCloseApiKeyModal = document.getElementById("btnCloseApiKeyModal");
-        const btnCancelApiKey = document.getElementById("btnCancelApiKey");
-        const btnSaveApiKey = document.getElementById("btnSaveApiKey");
-        const inputApiKeyVal = document.getElementById("inputApiKeyVal");
-
-        btnApiKey.addEventListener("click", () => {
-            apiKeyModal.style.display = "flex";
-        });
-        const closeKeyModal = () => { apiKeyModal.style.display = "none"; };
-        btnCloseApiKeyModal.addEventListener("click", closeKeyModal);
-        btnCancelApiKey.addEventListener("click", closeKeyModal);
-
-        btnSaveApiKey.addEventListener("click", async () => {
-            const key = inputApiKeyVal.value.trim();
-            if (!key) {
-                alert("Please enter a valid key or cancel.");
-                return;
-            }
-            try {
-                const res = await fetch("/api/set_api_key", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ api_key: key })
-                });
-                const d = await res.json();
-                showToast("🔑 Gemini API Key saved!");
-                closeKeyModal();
-            } catch (e) {
-                alert("Failed to save key: " + e.message);
-            }
-        });
-
-        // Open Excel file locally
+        // Open Excel
         btnOpenExcel.addEventListener("click", async () => {
             try {
                 const res = await fetch("/api/open_excel", { method: "POST" });
-                const data = await res.json();
-                if (data.success) {
-                    showToast("📂 Opened bug_report.xlsx in Excel!");
-                } else {
-                    alert("Notice: " + data.message);
-                }
+                const d = await res.json();
+                if (d.success) showToast("📂 Opened bug_report.xlsx in Excel!");
+                else alert(d.message);
             } catch (e) {
-                alert("Failed to open file: " + e.message);
+                alert("Failed: " + e.message);
             }
         });
 
@@ -1020,13 +1130,35 @@
         btnRefresh.addEventListener("click", async () => {
             try {
                 const res = await fetch("/api/reports");
-                const data = await res.json();
-                if (data.success) {
-                    updateTable(data.reports);
+                const d = await res.json();
+                if (d.success) {
+                    updateTable(d.headers, d.reports);
                     showToast("🔄 Table refreshed!");
                 }
             } catch (e) {
                 alert("Failed to refresh: " + e.message);
+            }
+        });
+
+        // API Key Modal
+        btnApiKey.addEventListener("click", () => { apiKeyModal.style.display = "flex"; });
+        const closeKeyModal = () => { apiKeyModal.style.display = "none"; };
+        btnCloseApiKeyModal.addEventListener("click", closeKeyModal);
+        btnCancelApiKey.addEventListener("click", closeKeyModal);
+
+        btnSaveApiKey.addEventListener("click", async () => {
+            const key = inputApiKeyVal.value.trim();
+            if (!key) return;
+            try {
+                const res = await fetch("/api/set_api_key", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ api_key: key })
+                });
+                showToast("🔑 Gemini API Key saved!");
+                closeKeyModal();
+            } catch (e) {
+                alert("Failed to save key: " + e.message);
             }
         });
     </script>
