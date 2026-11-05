@@ -22,7 +22,7 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024  # 32 MB
 
 def read_all_reports_from_excel(file_path: str = EXCEL_FILE) -> tuple:
-    """Reads current headers and all rows dynamically from bug_report.xlsx."""
+    """Reads current headers and all valid rows dynamically from bug_report.xlsx, strictly ignoring phantom rows."""
     p = Path(file_path)
     if not p.exists():
         return COLUMNS, []
@@ -42,7 +42,17 @@ def read_all_reports_from_excel(file_path: str = EXCEL_FILE) -> tuple:
     reports = []
     for r in range(2, ws.max_row + 1):
         vals = [ws.cell(row=r, column=c).value for c in range(1, len(headers) + 1)]
-        if not any(vals):
+        
+        # Must have at least some meaningful text (not just None, empty string, or single '-')
+        meaningful = [str(v).strip() for v in vals if v is not None and str(v).strip() not in ("", "-")]
+        if not meaningful:
+            continue
+
+        # Prevent ghost rows where TID, Module, and Title are all missing
+        tid_val = str(vals[0] or "").strip() if len(vals) > 0 else ""
+        mod_val = str(vals[1] or "").strip() if len(vals) > 1 else ""
+        title_val = str(vals[2] or "").strip() if len(vals) > 2 else ""
+        if not tid_val and not mod_val and not title_val:
             continue
 
         row_dict = {

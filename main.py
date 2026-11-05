@@ -3,6 +3,7 @@ import sys
 import re
 import io
 import mimetypes
+from datetime import datetime
 from pathlib import Path
 import requests
 import openpyxl
@@ -356,28 +357,72 @@ Respond with ONLY valid JSON:
 # ==============================================================================
 # 📊 EXCEL MANAGER (ONE SINGLE bug_report.xlsx FILE, FOREVER)
 # ==============================================================================
-def get_next_tid(ws, module: str = "") -> str:
-    """Generates clean, unique TID based on module or row index."""
-    mod = (module or "").lower()
-    if "dashboard" in mod:
-        prefix = "TC-DB"
-    elif "grant event" in mod:
-        prefix = "TC-GE"
-    elif "grant application" in mod or "form" in mod:
-        prefix = "TC-GA"
-    elif "life cycle" in mod:
-        prefix = "TC-LC"
-    elif "auth" in mod or "login" in mod:
-        prefix = "TC-AUTH"
-    else:
-        prefix = "TC-BUG"
+def get_next_tid(ws=None, module: str = "") -> str:
+    """
+    Auto-generates TID in the format: TID<month><day><sequence:02d>
+    Example on November 5th:
+        TID11501, TID11502, TID11503...
+    Where:
+        - 11 = Month (November)
+        - 5  = Day / Date (5th)
+        - 01, 02... = 2-digit sequential defect counter for that day
+    """
+    now = datetime.now()
+    prefix = f"TID{now.month}{now.day}"
 
-    count = 0
+    if ws is None:
+        return f"{prefix}01"
+
+    existing_seqs = []
     for r in range(2, ws.max_row + 1):
         val = str(ws.cell(r, 1).value or "").strip()
         if val.startswith(prefix):
-            count += 1
-    return f"{prefix}-{str(count + 1).zfill(2)}"
+            suffix = val[len(prefix):]
+            if suffix.isdigit():
+                existing_seqs.append(int(suffix))
+            else:
+                m = re.search(r"(\d+)$", val)
+                if m:
+                    existing_seqs.append(int(m.group(1)))
+
+    next_seq = (max(existing_seqs) + 1) if existing_seqs else 1
+    return f"{prefix}{next_seq:02d}"
+
+def compact_worksheet(ws) -> None:
+    """
+    Removes trailing blank rows, fixes desynchronized cell hyperlinks,
+    and removes any empty ghost rows in the middle so that data rows are always consecutive and contiguous.
+    """
+    # 1. Update all cell hyperlink coordinates so openpyxl doesn't resurrect phantom rows
+    for row in ws.iter_rows():
+        for cell in row:
+            if cell.hyperlink:
+                cell.hyperlink.ref = cell.coordinate
+
+    # 2. Remove trailing empty rows from the bottom
+    for r in range(ws.max_row, 1, -1):
+        vals = [ws.cell(r, c).value for c in range(1, ws.max_column + 1)]
+        has_data = any(v is not None and str(v).strip() not in ("", "-") for v in vals)
+        if not has_data:
+            ws.delete_rows(r)
+        else:
+            break
+
+    # 3. Remove any accidental empty rows in the middle
+    r = 2
+    while r <= ws.max_row:
+        vals = [ws.cell(r, c).value for c in range(1, ws.max_column + 1)]
+        has_data = any(v is not None and str(v).strip() not in ("", "-") for v in vals)
+        if not has_data:
+            ws.delete_rows(r)
+        else:
+            r += 1
+
+    # 4. Re-align hyperlink references again after row deletion
+    for row in ws.iter_rows():
+        for cell in row:
+            if cell.hyperlink:
+                cell.hyperlink.ref = cell.coordinate
 
 def delete_columns_from_excel(col_indices: list, file_path: str = EXCEL_FILE) -> list:
     """
@@ -397,6 +442,8 @@ def delete_columns_from_excel(col_indices: list, file_path: str = EXCEL_FILE) ->
         if 1 <= idx <= ws.max_column:
             ws.delete_cols(idx)
 
+    compact_worksheet(ws)
+
     # Save
     try:
         wb.save(file_path)
@@ -407,7 +454,7 @@ def delete_columns_from_excel(col_indices: list, file_path: str = EXCEL_FILE) ->
     return [str(ws.cell(1, c).value or "").strip() for c in range(1, ws.max_column + 1) if ws.cell(1, c).value]
 
 def delete_row_from_excel(row_num: int, file_path: str = EXCEL_FILE) -> bool:
-    """Deletes a specific data row from the Excel file (1-based index)."""
+    """Deletes a specific data row from the Excel file (1-based index) and compacts the sheet."""
     p = Path(file_path)
     if not p.exists():
         return False
@@ -417,6 +464,7 @@ def delete_row_from_excel(row_num: int, file_path: str = EXCEL_FILE) -> bool:
 
     if 2 <= row_num <= ws.max_row:
         ws.delete_rows(row_num)
+        compact_worksheet(ws)
         try:
             wb.save(file_path)
             return True
@@ -456,9 +504,12 @@ def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
             col_letter = get_column_letter(col_idx)
             ws.column_dimensions[col_letter].width = col_widths.get(col_letter, 22)
 
-    # Determine TID
+    # Clean existing ghost rows first
+    compact_worksheet(ws)
+
+    # Determine auto TID (format: TID<month><day><sequence:02d>)
     tid = bug_dict.get("tid")
-    if not tid or not str(tid).strip():
+    if not tid or not str(tid).strip() or str(tid).startswith("TC-"):
         tid = get_next_tid(ws, bug_dict.get("module", ""))
 
     next_row = ws.max_row + 1
@@ -554,6 +605,9 @@ def append_to_bug_report(bug_dict: dict, file_path: str = EXCEL_FILE) -> str:
     # Dynamic row height based on content lines (especially multiple screenshots & steps)
     lines_count = max([len(str(v).split("\n")) for v in values] + [1])
     ws.row_dimensions[next_row].height = max(40, min(160, lines_count * 20 + 15))
+
+    # Compact worksheet before saving
+    compact_worksheet(ws)
 
     # Save with Excel lock handling
     try:
