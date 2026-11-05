@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Bug Reporter Pro | Full 15-Column Defect Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-subtle: #eff6ff;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --bg-page: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --text-muted: #64748b;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        /* Header Navbar */
+        .navbar {
+            background: #0f172a;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-logo {
+            font-size: 26px;
+        }
+        .nav-brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .nav-brand span {
+            font-size: 11px;
+            color: #94a3b8;
+            display: block;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1440px;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+        }
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Input Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 960px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 20px 16px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-subtle);
+        }
+        .drop-icon {
+            font-size: 34px;
+            margin-bottom: 6px;
+        }
+        .drop-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .pill-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            margin-top: 6px;
+        }
+
+        /* Multi-Image Gallery */
+        .gallery-wrapper {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .gallery-item {
+            position: relative;
+            width: 100px;
+            height: 90px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: #0f172a;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-item .item-badge {
+            position: absolute;
+            bottom: 3px;
+            left: 3px;
+            background: rgba(15, 23, 42, 0.85);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .gallery-item .btn-remove-single {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: rgba(220, 38, 38, 0.85);
+            color: white;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Problem Input Area */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+        }
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+        .form-textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 180px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            color: var(--text-main);
+            background: #ffffff;
+            transition: border-color 0.15s ease;
+        }
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover:not(:disabled) {
+            background: var(--success-hover);
+        }
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 15px;
+            width: 100%;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Progress Box */
+        .progress-box {
+            margin-top: 18px;
+            padding: 16px 20px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .spinner {
+            width: 26px;
+            height: 26px;
+            border: 3px solid #bfdbfe;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-text strong {
+            display: block;
+            font-size: 14px;
+            color: #1e3a8a;
+        }
+        .progress-text span {
+            font-size: 12px;
+            color: #3b82f6;
+        }
+
+        /* Full 15-Column Spreadsheet Table */
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 520px;
+            border: 1px solid var(--border);
+        }
+        .report-table {
+            width: 100%;
+            min-width: 2200px; /* Ensures all 15 columns breathe cleanly */
+            border-collapse: collapse;
+            font-size: 12.5px;
+            text-align: left;
+        }
+        .report-table thead th {
+            background: #1e3a8a;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 12px 14px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid #2e4a9e;
+        }
+        .report-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            vertical-align: top;
+            background: #ffffff;
+        }
+        .report-table tbody tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+        .report-table tbody tr:hover td {
+            background: #f1f5f9;
+        }
+
+        .tid-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-fail { background: #fee2e2; color: #991b1b; }
+        .status-pass { background: #d1fae5; color: #065f46; }
+        .status-new { background: #fef3c7; color: #92400e; }
+
+        /* Link Buttons & Chips */
+        .link-chips {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .link-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            width: fit-content;
+        }
+        .link-chip:hover {
+            background: #dbeafe;
+            text-decoration: underline;
+        }
+
+        .cell-pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            min-width: 180px;
+            max-width: 280px;
+        }
+        .cell-steps {
+            min-width: 220px;
+            max-width: 320px;
+        }
+        .cell-actual {
+            color: #991b1b;
+            font-weight: 500;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a;
+            color: white;
+            padding: 14px 22px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.25s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .search-box {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            width: 260px;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .scroll-hint {
+            font-size: 11px;
+            color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="nav-brand">
+            <span class="nav-logo">🐞</span>
+            <div>
+                <h1>QA Bug Reporter Pro</h1>
+                <span>Banglish/English &rarr; 100% Professional QA English &rarr; Full 15-Column Excel</span>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <button id="btnApiKey" class="btn btn-sm btn-outline" style="color: white; border-color: #475569;" title="Set Google Gemini AI Key for vision analysis">
+                <span>🔑 AI Key (Optional)</span>
+            </button>
+            <button id="btnOpenExcel" class="btn btn-success" title="Open the Excel file directly in Microsoft Excel">
+                <span>📂 Open bug_report.xlsx</span>
+            </button>
+            <a href="/api/download" class="btn btn-outline" style="color: white; border-color: #334155;">
+                <span>📥 Download .xlsx</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Input Dashboard Card -->
+        <section class="card">
+            <div class="card-header">
+                <h2>New Bug Entry (Input in Banglish &rarr; Saves in 100% Professional English)</h2>
+                <span class="pill-badge">⚡ Instant Cloud Upload & Excel Auto-Sync</span>
+            </div>
+            <div class="card-body">
+                <form id="bugForm">
+                    <div class="grid-2">
+                        <!-- Step 1: Multiple Screenshots Upload -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label class="form-label">1. Problem Screenshots <span style="font-weight: 400; color: #64748b;">(Optional, 1 or Multiple)</span></label>
+                                <span id="ssCounterBadge" style="font-size: 11px; font-weight: 600; color: #2563eb; display: none;">0 Attached</span>
+                            </div>
+                            
+                            <!-- Hidden input supporting MULTIPLE files -->
+                            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                            
+                            <div class="drop-zone" id="dropZone">
+                                <div class="drop-icon">📸</div>
+                                <div class="drop-title">Drop 1 or multiple screenshots here, or click to browse</div>
+                                <span class="pill-badge">💡 Tip: Press Ctrl + V to paste screenshots directly!</span>
+                            </div>
+
+                            <!-- Attached Images Gallery -->
+                            <div class="gallery-wrapper" id="galleryWrapper" style="display: none;">
+                                <div class="gallery-header">
+                                    <span id="galleryCountText">Attached Screenshots:</span>
+                                    <button type="button" class="btn btn-sm btn-outline" id="btnClearAllSS" style="color: #dc2626; border-color: #fca5a5;">✕ Clear All</button>
+                                </div>
+                                <div class="gallery-grid" id="galleryGrid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Problem Description in Banglish -->
+                        <div class="form-group">
+                            <label class="form-label" for="problemDesc">2. Problem Description <span style="font-weight: 400; color: #64748b;">(Write in Banglish, Bengali, or English)</span></label>
+                            <textarea id="problemDesc" class="form-textarea" placeholder="apni banglish a likun, program ta sob kichu 100% professional simple English a Excel a save korbe...&#10;&#10;e.g. applicant end a amr akta application asa kintu dash a zero dekay&#10;or&#10;Delete icon e click korle top-right corner-e 404 Not Found error ashe&#10;or&#10;Super Admin Form Builder-e create kora dynamic fields applicant form-e ashche na" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary btn-lg" id="btnSubmit">
+                            <span>🚀 Convert to Professional QA English & Add to Excel</span>
+                        </button>
+                    </div>
+
+                    <!-- Live Progress State -->
+                    <div class="progress-box" id="progressBox" style="display: none;">
+                        <div class="spinner"></div>
+                        <div class="progress-text">
+                            <strong id="progressTitle">Uploading screenshots to cloud...</strong>
+                            <span id="progressSub">Converting Banglish to 100% Professional QA English and populating all 15 Excel columns...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Full 15-Column Existing Reports Table -->
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Excel Bug Reports (<span id="totalBugsCount">{{ reports|length }}</span> Defects Logged)</h2>
+                    <span style="font-size: 12px; color: #64748b;">File: <strong>bug_report.xlsx</strong> &bull; Exact 15 Columns Displayed Below</span>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <span class="scroll-hint">&larr; Scroll horizontally to view all 15 columns &rarr;</span>
+                    <input type="text" id="searchTable" class="search-box" placeholder="🔍 Search any column..." />
+                    <button type="button" class="btn btn-sm btn-outline" id="btnRefresh">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                    <table class="report-table" id="reportTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">1. TID</th>
+                                <th style="width: 180px;">2. Module</th>
+                                <th style="width: 250px;">3. Test Case Title</th>
+                                <th style="width: 240px;">4. Test Scenario</th>
+                                <th style="width: 160px;">5. Test Data</th>
+                                <th style="width: 260px;">6. Test Step</th>
+                                <th style="width: 240px;">7. Expected Result</th>
+                                <th style="width: 250px;">8. Actual Result</th>
+                                <th style="width: 100px;">9. Status</th>
+                                <th style="width: 200px;">10. Screenshort</th>
+                                <th style="width: 140px;">11. Dev Comment</th>
+                                <th style="width: 240px;">12. QA Comment</th>
+                                <th style="width: 120px;">13. Status (Defect)</th>
+                                <th style="width: 140px;">14. Dev</th>
+                                <th style="width: 140px;">15. Dev Comennt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            {% for r in reports %}
+                            <tr>
+                                <!-- 1. TID -->
+                                <td><span class="tid-badge">{{ r.tid }}</span></td>
+                                <!-- 2. Module -->
+                                <td><strong>{{ r.module }}</strong></td>
+                                <!-- 3. Title -->
+                                <td>{{ r.title }}</td>
+                                <!-- 4. Scenario -->
+                                <td class="cell-pre">{{ r.scenario }}</td>
+                                <!-- 5. Test Data -->
+                                <td>{{ r.test_data }}</td>
+                                <!-- 6. Test Step -->
+                                <td class="cell-pre cell-steps">{{ r.steps }}</td>
+                                <!-- 7. Expected Result -->
+                                <td class="cell-pre">{{ r.expected }}</td>
+                                <!-- 8. Actual Result -->
+                                <td class="cell-pre cell-actual">{{ r.actual }}</td>
+                                <!-- 9. Status (Execution) -->
+                                <td style="text-align: center;">
+                                    <span class="status-badge status-{{ (r.status or 'fail')|lower }}">{{ r.status }}</span>
+                                </td>
+                                <!-- 10. Screenshort -->
+                                <td>
+                                    <div class="link-chips">
+                                        {% if r.screenshort and 'http' in r.screenshort %}
+                                            {% for line in r.screenshort.split('\n') %}
+                                                {% if 'http' in line %}
+                                                    {% set parts = line.split('http') %}
+                                                    {% set label = parts[0].replace(':', '').strip() or 'View SS' %}
+                                                    {% set url = 'http' + parts[1].strip() %}
+                                                    <a href="{{ url }}" target="_blank" class="link-chip">🔗 {{ label }}</a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <span style="color: #94a3b8;">-</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <!-- 11. Dev Comment -->
+                                <td style="color: #64748b;">{{ r.dev_comment or '-' }}</td>
+                                <!-- 12. QA Comment -->
+                                <td class="cell-pre" style="font-size: 12px; color: #334155;">{{ r.qa_comment }}</td>
+                                <!-- 13. Status (Defect) -->
+                                <td style="text-align: center;">
+                                    <span class="status-badge status-new">{{ r.defect_status }}</span>
+                                </td>
+                                <!-- 14. Dev -->
+                                <td style="text-align: center;">{{ r.dev }}</td>
+                                <!-- 15. Dev Comennt -->
+                                <td style="color: #64748b;">{{ r.dev_comennt or '-' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="15" style="text-align: center; color: #94a3b8; padding: 40px;">
+                                    No bug reports logged yet. Add your first bug above!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- API Key Modal -->
+    <div id="apiKeyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; width: 90%; max-width: 480px; padding: 24px; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700;">🔑 Google Gemini AI Key (Optional)</h3>
+                <button type="button" id="btnCloseApiKeyModal" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748b;">✕</button>
+            </div>
+            <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+                Gemini Vision AI can inspect your screenshots visually and automatically write the entire QA report.
+                <br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #2563eb; text-decoration: underline;">Get a 100% Free Gemini API key here &rarr;</a>
+            </p>
+            <input type="password" id="inputApiKeyVal" class="form-textarea" style="min-height: 44px; height: 44px; padding: 10px; margin-bottom: 16px;" placeholder="AIzaSy..." />
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-outline" id="btnCancelApiKey">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSaveApiKey">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedFiles = [];
+
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("fileInput");
+        const galleryWrapper = document.getElementById("galleryWrapper");
+        const galleryGrid = document.getElementById("galleryGrid");
+        const galleryCountText = document.getElementById("galleryCountText");
+        const ssCounterBadge = document.getElementById("ssCounterBadge");
+        const btnClearAllSS = document.getElementById("btnClearAllSS");
+        const bugForm = document.getElementById("bugForm");
+        const problemDesc = document.getElementById("problemDesc");
+        const btnSubmit = document.getElementById("btnSubmit");
+        const progressBox = document.getElementById("progressBox");
+        const progressTitle = document.getElementById("progressTitle");
+        const progressSub = document.getElementById("progressSub");
+        const reportTableBody = document.getElementById("reportTableBody");
+        const totalBugsCount = document.getElementById("totalBugsCount");
+        const searchTable = document.getElementById("searchTable");
+        const btnOpenExcel = document.getElementById("btnOpenExcel");
+        const btnRefresh = document.getElementById("btnRefresh");
+        const toast = document.getElementById("toast");
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+
+        // Add 1 or multiple files to gallery
+        function addFiles(filesList) {
+            let addedCount = 0;
+            for (let file of filesList) {
+                if (file && file.type && file.type.startsWith("image/")) {
+                    selectedFiles.push(file);
+                    addedCount++;
+                }
+            }
+            if (addedCount > 0) {
+                renderGallery();
+                showToast(`📸 ${addedCount} screenshot(s) attached! (Total: ${selectedFiles.length})`);
+            }
+        }
+
+        // Render multi-image thumbnail gallery
+        function renderGallery() {
+            galleryGrid.innerHTML = "";
+            if (selectedFiles.length === 0) {
+                galleryWrapper.style.display = "none";
+                ssCounterBadge.style.display = "none";
+                return;
+            }
+
+            galleryWrapper.style.display = "flex";
+            ssCounterBadge.style.display = "inline";
+            ssCounterBadge.textContent = `${selectedFiles.length} Attached`;
+            galleryCountText.textContent = `Attached Screenshots (${selectedFiles.length} ready to upload):`;
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement("div");
+                item.className = "gallery-item";
+
+                const img = document.createElement("img");
+                const reader = new FileReader();
+                reader.onload = (e) => { img.src = e.target.result; };
+                reader.readAsDataURL(file);
+
+                const badge = document.createElement("span");
+                badge.className = "item-badge";
+                badge.textContent = `SS #${index + 1}`;
+
+                const btnRemove = document.createElement("button");
+                btnRemove.type = "button";
+                btnRemove.className = "btn-remove-single";
+                btnRemove.innerHTML = "✕";
+                btnRemove.title = "Remove this screenshot";
+                btnRemove.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedFiles.splice(index, 1);
+                    renderGallery();
+                };
+
+                item.appendChild(img);
+                item.appendChild(badge);
+                item.appendChild(btnRemove);
+                galleryGrid.appendChild(item);
+            });
+        }
+
+        function clearAllScreenshots() {
+            selectedFiles = [];
+            fileInput.value = "";
+            renderGallery();
+        }
+
+        btnClearAllSS.addEventListener("click", clearAllScreenshots);
+
+        dropZone.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                addFiles(e.target.files);
+                fileInput.value = "";
+            }
+        });
+
+        // Drag & Drop multiple files
+        ["dragenter", "dragover"].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                dropZone.classList.add("dragover");
+            });
+        });
+
+        ["dragleave", "drop"].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+            });
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                addFiles(e.dataTransfer.files);
+            }
+        });
+
+        // Global Paste (Ctrl + V) - Supports pasting multiple screenshots
+        window.addEventListener("paste", (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            const pastedImages = [];
+            for (let item of items) {
+                if (item.kind === "file" && item.type.startsWith("image/")) {
+                    e.preventDefault();
+                    pastedImages.push(item.getAsFile());
+                }
+            }
+            if (pastedImages.length > 0) {
+                addFiles(pastedImages);
+            }
+        });
+
+        // Submit Form
+        bugForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = problemDesc.value.trim();
+            if (!text) return;
+
+            btnSubmit.disabled = true;
+            progressBox.style.display = "flex";
+            progressTitle.textContent = selectedFiles.length > 0 
+                ? `☁️ Uploading ${selectedFiles.length} screenshot(s) to cloud...`
+                : "🧠 Translating Banglish to 100% Professional QA English...";
+            progressSub.textContent = "Writing to all 15 columns in bug_report.xlsx...";
+
+            const formData = new FormData();
+            formData.append("problem", text);
+
+            selectedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
+
+            try {
+                const res = await fetch("/api/add_bug", {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "Failed to add bug report.");
+                }
+
+                showToast(`🎉 Saved [${result.tid}] to bug_report.xlsx in Professional English!`);
+                updateTable(result.reports);
+
+                problemDesc.value = "";
+                clearAllScreenshots();
+
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                progressBox.style.display = "none";
+            }
+        });
+
+        // Helper to format screenshot links
+        function renderScreenshotsHtml(ssText) {
+            if (!ssText || !ssText.includes("http")) {
+                return `<span style="color: #94a3b8;">-</span>`;
+            }
+            const lines = ssText.split("\n");
+            let chipsHtml = "";
+            lines.forEach((line) => {
+                if (line.includes("http")) {
+                    const parts = line.split("http");
+                    const label = parts[0].replace(/[:\s]+$/, "") || "View SS";
+                    const url = "http" + parts[1].trim();
+                    chipsHtml += `<a href="${url}" target="_blank" class="link-chip">🔗 ${escapeHtml(label)}</a>`;
+                }
+            });
+            return `<div class="link-chips">${chipsHtml}</div>`;
+        }
+
+        // Dynamically update the full 15-column table
+        function updateTable(reports) {
+            totalBugsCount.textContent = reports.length;
+            if (!reports || reports.length === 0) {
+                reportTableBody.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #94a3b8; padding: 40px;">No bug reports logged yet.</td></tr>`;
+                return;
+            }
+
+            reportTableBody.innerHTML = reports.map(r => `
+                <tr>
+                    <!-- 1. TID -->
+                    <td><span class="tid-badge">${escapeHtml(r.tid)}</span></td>
+                    <!-- 2. Module -->
+                    <td><strong>${escapeHtml(r.module)}</strong></td>
+                    <!-- 3. Title -->
+                    <td>${escapeHtml(r.title)}</td>
+                    <!-- 4. Scenario -->
+                    <td class="cell-pre">${escapeHtml(r.scenario)}</td>
+                    <!-- 5. Test Data -->
+                    <td>${escapeHtml(r.test_data || 'N/A')}</td>
+                    <!-- 6. Test Step -->
+                    <td class="cell-pre cell-steps">${escapeHtml(r.steps)}</td>
+                    <!-- 7. Expected Result -->
+                    <td class="cell-pre">${escapeHtml(r.expected)}</td>
+                    <!-- 8. Actual Result -->
+                    <td class="cell-pre cell-actual">${escapeHtml(r.actual)}</td>
+                    <!-- 9. Status (Execution) -->
+                    <td style="text-align: center;">
+                        <span class="status-badge status-${(r.status || 'fail').toLowerCase()}">${escapeHtml(r.status)}</span>
+                    </td>
+                    <!-- 10. Screenshort -->
+                    <td>${renderScreenshotsHtml(r.screenshort)}</td>
+                    <!-- 11. Dev Comment -->
+                    <td style="color: #64748b;">${escapeHtml(r.dev_comment || '-')}</td>
+                    <!-- 12. QA Comment -->
+                    <td class="cell-pre" style="font-size: 12px; color: #334155;">${escapeHtml(r.qa_comment)}</td>
+                    <!-- 13. Status (Defect) -->
+                    <td style="text-align: center;">
+                        <span class="status-badge status-new">${escapeHtml(r.defect_status || 'New')}</span>
+                    </td>
+                    <!-- 14. Dev -->
+                    <td style="text-align: center;">${escapeHtml(r.dev || 'Unassigned')}</td>
+                    <!-- 15. Dev Comennt -->
+                    <td style="color: #64748b;">${escapeHtml(r.dev_comennt || '-')}</td>
+                </tr>
+            `).join("");
+        }
+
+        function escapeHtml(s) {
+            if (!s) return "";
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Search Filter across all 15 columns
+        searchTable.addEventListener("input", (e) => {
+            const q = e.target.value.toLowerCase();
+            const rows = reportTableBody.querySelectorAll("tr");
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none";
+            });
+        });
+
+        // API Key Modal
+        const btnApiKey = document.getElementById("btnApiKey");
+        const apiKeyModal = document.getElementById("apiKeyModal");
+        const btnCloseApiKeyModal = document.getElementById("btnCloseApiKeyModal");
+        const btnCancelApiKey = document.getElementById("btnCancelApiKey");
+        const btnSaveApiKey = document.getElementById("btnSaveApiKey");
+        const inputApiKeyVal = document.getElementById("inputApiKeyVal");
+
+        btnApiKey.addEventListener("click", () => {
+            apiKeyModal.style.display = "flex";
+        });
+        const closeKeyModal = () => { apiKeyModal.style.display = "none"; };
+        btnCloseApiKeyModal.addEventListener("click", closeKeyModal);
+        btnCancelApiKey.addEventListener("click", closeKeyModal);
+
+        btnSaveApiKey.addEventListener("click", async () => {
+            const key = inputApiKeyVal.value.trim();
+            if (!key) {
+                alert("Please enter a valid key or cancel.");
+                return;
+            }
+            try {
+                const res = await fetch("/api/set_api_key", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ api_key: key })
+                });
+                const d = await res.json();
+                showToast("🔑 Gemini API Key saved!");
+                closeKeyModal();
+            } catch (e) {
+                alert("Failed to save key: " + e.message);
+            }
+        });
+
+        // Open Excel file locally
+        btnOpenExcel.addEventListener("click", async () => {
+            try {
+                const res = await fetch("/api/open_excel", { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    showToast("📂 Opened bug_report.xlsx in Excel!");
+                } else {
+                    alert("Notice: " + data.message);
+                }
+            } catch (e) {
+                alert("Failed to open file: " + e.message);
+            }
+        });
+
+        // Refresh Table
+        btnRefresh.addEventListener("click", async () => {
+            try {
+                const res = await fetch("/api/reports");
+                const data = await res.json();
+                if (data.success) {
+                    updateTable(data.reports);
+                    showToast("🔄 Table refreshed!");
+                }
+            } catch (e) {
+                alert("Failed to refresh: " + e.message);
+            }
+        });
+    </script>
+</body>
+</html>
