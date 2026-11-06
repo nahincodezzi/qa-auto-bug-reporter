@@ -528,23 +528,37 @@
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <label class="form-label">1. Problem Screenshots <span style="font-weight: 400; color: #64748b;">(Optional, 1 or Multiple)</span></label>
-                                <span id="ssCounterBadge" style="font-size: 11px; font-weight: 600; color: #2563eb; display: none;">0 Attached</span>
+                                <span id="ssCounterBadge" style="font-size: 11px; font-weight: 700; color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 9999px; display: none;">0 Attached</span>
                             </div>
                             
-                            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                            <!-- Hidden actual file input supporting all image extensions -->
+                            <input type="file" id="fileInput" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.jfif" multiple style="display: none;">
                             
-                            <div class="drop-zone" id="dropZone">
-                                <div class="drop-icon">📸</div>
-                                <div class="drop-title">Drop 1 or multiple screenshots here, or click to browse</div>
-                                <span class="pill-badge">💡 Tip: Press Ctrl + V to paste screenshots directly!</span>
+                            <!-- Interactive Drop Zone -->
+                            <div class="drop-zone" id="dropZone" style="cursor: pointer; text-align: center; padding: 24px 16px;">
+                                <div class="drop-icon" style="font-size: 36px; margin-bottom: 6px;">📸</div>
+                                <div class="drop-title" id="dropZoneTitle" style="font-size: 14px; font-weight: 600; color: #1e293b;">
+                                    Drop 1 or multiple screenshots here, or click to browse
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnBrowseFiles" style="padding: 7px 16px; font-size: 13px; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+                                        📁 Select Screenshot / Image Files
+                                    </button>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <span class="pill-badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+                                        💡 Tip: You can also press <strong>Ctrl + V</strong> anywhere to paste directly!
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="gallery-wrapper" id="galleryWrapper" style="display: none;">
-                                <div class="gallery-header">
-                                    <span id="galleryCountText">Attached Screenshots:</span>
-                                    <button type="button" class="btn btn-sm btn-outline" id="btnClearAllSS" style="color: #dc2626; border-color: #fca5a5;">✕ Clear All</button>
+                            <!-- Attached Screenshots Thumbnail Gallery -->
+                            <div class="gallery-wrapper" id="galleryWrapper" style="display: none; margin-top: 14px;">
+                                <div class="gallery-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span id="galleryCountText" style="font-weight: 700; font-size: 13px; color: #0f172a;">Attached Screenshots:</span>
+                                    <button type="button" class="btn btn-sm btn-outline" id="btnClearAllSS" style="color: #dc2626; border-color: #fca5a5; padding: 3px 10px; font-size: 11px;">✕ Clear All</button>
                                 </div>
-                                <div class="gallery-grid" id="galleryGrid"></div>
+                                <div class="gallery-grid" id="galleryGrid" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 220px; overflow-y: auto; padding: 4px;"></div>
                             </div>
                         </div>
 
@@ -754,6 +768,8 @@
 
         // DOM elements
         const dropZone = document.getElementById("dropZone");
+        const dropZoneTitle = document.getElementById("dropZoneTitle");
+        const btnBrowseFiles = document.getElementById("btnBrowseFiles");
         const fileInput = document.getElementById("fileInput");
         const galleryWrapper = document.getElementById("galleryWrapper");
         const galleryGrid = document.getElementById("galleryGrid");
@@ -799,18 +815,42 @@
             setTimeout(() => toast.classList.remove("show"), 3500);
         }
 
-        // Multi-Image Handling
+        // =========================================================================
+        // 📸 ULTRA-ROBUST MULTI-IMAGE UPLOAD & SELECTION
+        // =========================================================================
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Comprehensive validator: Checks MIME type AND file extension
+        function isImageFile(file) {
+            if (!file) return false;
+            if (file.type && file.type.toLowerCase().startsWith("image/")) return true;
+            const name = (file.name || "").toLowerCase();
+            return /\.(png|jpe?g|webp|gif|bmp|jfif|svg)$/i.test(name);
+        }
+
         function addFiles(filesList) {
             let addedCount = 0;
-            for (let file of filesList) {
-                if (file && file.type && file.type.startsWith("image/")) {
+            let invalidCount = 0;
+            const arr = Array.from(filesList);
+            for (let file of arr) {
+                if (isImageFile(file)) {
                     selectedFiles.push(file);
                     addedCount++;
+                } else {
+                    invalidCount++;
                 }
             }
             if (addedCount > 0) {
                 renderGallery();
                 showToast(`📸 ${addedCount} screenshot(s) attached! (Total: ${selectedFiles.length})`);
+            } else if (invalidCount > 0) {
+                showToast(`⚠️ Please select image files only (PNG, JPG, WebP, etc.).`);
             }
         }
 
@@ -830,6 +870,9 @@
             selectedFiles.forEach((file, index) => {
                 const item = document.createElement("div");
                 item.className = "gallery-item";
+                item.style.position = "relative";
+                item.style.width = "110px";
+                item.style.height = "100px";
 
                 const img = document.createElement("img");
                 const reader = new FileReader();
@@ -838,7 +881,8 @@
 
                 const badge = document.createElement("span");
                 badge.className = "item-badge";
-                badge.textContent = `SS #${index + 1}`;
+                const sizeStr = file.size ? ` (${formatBytes(file.size)})` : "";
+                badge.textContent = `SS #${index + 1}${sizeStr}`;
 
                 const btnRemove = document.createElement("button");
                 btnRemove.type = "button";
@@ -862,47 +906,75 @@
             selectedFiles = [];
             fileInput.value = "";
             renderGallery();
+            showToast("🧹 All attached screenshots cleared.");
         });
 
-        dropZone.addEventListener("click", () => fileInput.click());
+        // Click handler for dedicated 'Browse & Select Files' button
+        btnBrowseFiles.addEventListener("click", (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        // Click handler for entire Drop Zone container
+        dropZone.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        // File input change event (triggers after picking files in native dialog)
         fileInput.addEventListener("change", (e) => {
             if (e.target.files && e.target.files.length > 0) {
                 addFiles(e.target.files);
-                fileInput.value = "";
+                fileInput.value = ""; // Reset so same file can be selected again
             }
         });
 
-        ["dragenter", "dragover"].forEach(name => {
-            dropZone.addEventListener(name, (e) => {
+        // Global window drag & drop prevention (prevents browser from navigating away on drop)
+        window.addEventListener("dragover", (e) => e.preventDefault(), false);
+        window.addEventListener("drop", (e) => e.preventDefault(), false);
+
+        // Dedicated Drop Zone Drag Events
+        ["dragenter", "dragover"].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 dropZone.classList.add("dragover");
-            });
+                dropZoneTitle.textContent = "📥 Drop screenshot files here now!";
+            }, false);
         });
 
-        ["dragleave", "drop"].forEach(name => {
-            dropZone.addEventListener(name, (e) => {
+        ["dragleave", "dragend"].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 dropZone.classList.remove("dragover");
-            });
+                dropZoneTitle.textContent = "Drop 1 or multiple screenshots here, or click to browse";
+            }, false);
         });
 
         dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove("dragover");
+            dropZoneTitle.textContent = "Drop 1 or multiple screenshots here, or click to browse";
             if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 addFiles(e.dataTransfer.files);
             }
-        });
+        }, false);
 
-        // Global Paste (Ctrl + V)
+        // Global Paste (<kbd>Ctrl</kbd> + <kbd>V</kbd>) from OS Clipboard
         window.addEventListener("paste", (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             const pastedImages = [];
             for (let item of items) {
-                if (item.kind === "file" && item.type.startsWith("image/")) {
-                    e.preventDefault();
-                    pastedImages.push(item.getAsFile());
+                if (item.kind === "file") {
+                    const blob = item.getAsFile();
+                    if (isImageFile(blob)) {
+                        pastedImages.push(blob);
+                    }
                 }
             }
             if (pastedImages.length > 0) {
+                e.preventDefault();
                 addFiles(pastedImages);
             }
         });
