@@ -14,6 +14,7 @@ from main import (
     append_to_bug_report,
     delete_columns_from_excel,
     delete_row_from_excel,
+    test_gemini_connection,
     EXCEL_FILE,
     COLUMNS
 )
@@ -104,10 +105,12 @@ def api_add_bug():
         cloud_url = "-"
 
     # Structure into 100% professional QA format using AI / Smart Engine
+    model_name = request.form.get("model") or os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
     qa_data = convert_problem_to_qa_report(
         problem_text=problem_text,
         image_bytes=first_img_bytes,
-        mime_type=first_mime
+        mime_type=first_mime,
+        model_name=model_name
     )
     qa_data["screenshort"] = cloud_url
 
@@ -180,23 +183,63 @@ def api_delete_row():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/ai_status", methods=["GET"])
+def api_ai_status():
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key and Path(".env").exists():
+        from dotenv import load_dotenv
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+
+    model = os.getenv("GEMINI_MODEL", "gemini-2.5-pro").strip()
+    masked_key = ""
+    if api_key:
+        if len(api_key) > 8:
+            masked_key = api_key[:4] + "••••••••" + api_key[-4:]
+        else:
+            masked_key = "••••••••"
+
+    return jsonify({
+        "success": True,
+        "active": bool(api_key),
+        "model": model or "gemini-2.5-pro",
+        "masked_key": masked_key
+    })
+
+@app.route("/api/test_ai_key", methods=["POST"])
+def api_test_ai_key():
+    data = request.json or {}
+    key = data.get("api_key", "").strip()
+    model = data.get("model", "gemini-2.5-pro").strip()
+    if not key:
+        return jsonify({"success": False, "error": "API Key is required."}), 400
+
+    ok, msg = test_gemini_connection(key, model)
+    return jsonify({"success": ok, "message": msg})
+
 @app.route("/api/set_api_key", methods=["POST"])
 def api_set_api_key():
     data = request.json or {}
     key = data.get("api_key", "").strip()
+    model = data.get("model", "gemini-2.5-pro").strip()
+    
     os.environ["GEMINI_API_KEY"] = key
+    os.environ["GEMINI_MODEL"] = model
 
     # Save to .env file
     try:
-        from dotenv import set_key
         env_path = Path(".env")
-        if not env_path.exists():
-            env_path.write_text(f"GEMINI_API_KEY={key}\n", encoding="utf-8")
-        else:
-            set_key(str(env_path), "GEMINI_API_KEY", key)
-        return jsonify({"success": True, "message": "Gemini API Key saved successfully!"})
+        env_lines = []
+        if env_path.exists():
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                if not line.startswith("GEMINI_API_KEY=") and not line.startswith("GEMINI_MODEL="):
+                    env_lines.append(line)
+        env_lines.append(f"GEMINI_API_KEY={key}")
+        env_lines.append(f"GEMINI_MODEL={model}")
+        env_path.write_text("\n".join(env_lines) + "\n", encoding="utf-8")
+        return jsonify({"success": True, "message": f"Saved {model} and API key successfully!"})
     except Exception as e:
-        return jsonify({"success": True, "message": f"Key set in session ({e})"})
+        return jsonify({"success": True, "message": f"Saved in session: {e}"})
 
 @app.route("/api/open_excel", methods=["POST"])
 def api_open_excel():
