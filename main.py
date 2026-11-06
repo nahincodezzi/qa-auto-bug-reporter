@@ -341,8 +341,41 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "The Dashboard counter displays 0 applications despite an active submitted application existing under the applicant account."
         qa_comment = "Data aggregation failure. The dashboard metrics endpoint returns 0 or fails to query the applicant's submission records."
 
-    # Pattern 5: Form Builder / Dynamic Field synchronization defect
-    elif any(w in text_lower for w in ["form", "builder", "field", "schema", "tab", "project information"]):
+    # Pattern 5: Search and Filter Functionality
+    elif any(w in text_lower for w in ["search", "filter", "khuj", "khoj", "filter korle", "search dile"]):
+        module = "Data Grid > Search & Filters"
+        title = "Verify real-time search filter returns matching records"
+        scenario = "Verify that entering valid search terms filters table records dynamically without dropping results or hanging."
+        test_data = "Existing record keyword or ID"
+        steps = "1. Navigate to the data table interface.\n2. Enter an existing record keyword into the search input field.\n3. Press Enter or observe instant debounced search results."
+        expected = "The table should filter dynamically and display only records matching the search query."
+        actual = "Search query fails to filter records; the table displays 'No records found' or fails to refresh data."
+        qa_comment = "Frontend search debouncing issue, backend query parameter mismatch, or missing case-insensitive search index."
+
+    # Pattern 6: Data Export (Excel / CSV / PDF)
+    elif "export" in text_lower or ("download" in text_lower and any(w in text_lower for w in ["excel", "csv", "pdf", "file", "report"])) or "download button" in text_lower:
+        module = "Reports & Data Export"
+        title = "Verify export functionality downloads valid data spreadsheet"
+        scenario = "Verify that triggering the Export action generates a downloadable file containing all active filtered records."
+        test_data = "Active record set in table view"
+        steps = "1. Navigate to the report or data list page.\n2. Apply any relevant filters or keep default view.\n3. Click on the 'Export to Excel' / 'Download' button.\n4. Verify downloaded file."
+        expected = "The application should trigger file download promptly, and the generated spreadsheet should contain complete, uncorrupted data."
+        actual = "Clicking Export fails to initiate download, throws a server 500 error, or generates an empty corrupted file."
+        qa_comment = "Server-side file generation exception or missing Blob response headers (Content-Disposition, Content-Type)."
+
+    # Pattern 7: Pagination & Page Navigation
+    elif any(w in text_lower for w in ["pagination", "page 2", "next page", "page change", "page number"]):
+        module = "Data Grid > Pagination"
+        title = "Verify table pagination navigation across multiple pages"
+        scenario = "Verify that navigating between pagination pages correctly updates table row items with corresponding data offset."
+        test_data = "Multi-page dataset (> 10 records)"
+        steps = "1. Navigate to a paginated table view.\n2. Scroll to the bottom pagination controls.\n3. Click on 'Next' or Page '2'.\n4. Observe table data."
+        expected = "The table should fetch and display the second page of records with correct offset and updated item count."
+        actual = "Clicking page 2 fails to load data, displays a blank table, or resets pagination back to page 1."
+        qa_comment = "Pagination state synchronization error; query parameters 'page' and 'limit' are not passed correctly to API endpoint."
+
+    # Pattern 8: Form Builder / Dynamic Field synchronization defect
+    elif any(w in text_lower for w in ["builder", "form schema", "dynamic field", "custom field", "form builder", "project information"]):
         module = "Super Admin > Grant Application Form"
         title = "Verify dynamic form fields created in Form Builder render on applicant portal"
         scenario = "Verify end-to-end synchronization between Form Builder schema configuration and user-facing submission forms."
@@ -352,7 +385,7 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "Configured fields from the Form Builder do not render on the applicant portal. The form continues to display static default fields."
         qa_comment = "Dynamic form schema is not synchronized or fetched by the client-side application create endpoint."
 
-    # Pattern 6: Delete operation failure / 404 / 500 error
+    # Pattern 9: Delete operation failure / 404 / 500 error
     elif "delete" in text_lower or "remove" in text_lower:
         if "event" in text_lower:
             module = "Super Admin > Grant Event"
@@ -368,7 +401,62 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "Clicking the Delete button fails and triggers an unexpected server error or HTTP 404 Not Found response."
         qa_comment = "Backend API error during DELETE request. Verify endpoint route registration and parameter mapping."
 
-    # Pattern 7: Phone number / Email / Input field validation
+    # Pattern 10: File Upload & Attachment
+    elif any(w in text_lower for w in ["upload", "attachment", "file select", "image upload", "dropzone", "browse"]):
+        module = "File Management > Upload"
+        title = "Verify file upload accepts valid attachments and displays preview"
+        scenario = "Verify that authorized users can upload supported file formats within size limits without network failures."
+        test_data = "Valid image/document file (PNG/JPG/PDF, < 10MB)"
+        steps = "1. Navigate to the file upload section.\n2. Click 'Browse' or drag and drop a valid file.\n3. Verify file preview and filename display.\n4. Click upload or submit form."
+        expected = "The file should upload successfully, display a progress bar, and show uploaded attachment preview."
+        actual = "File upload hangs indefinitely, fails silently, or displays an unhandled multipart form data error."
+        qa_comment = "Multipart/form-data encoding issue, CORS policy block on storage endpoint, or missing file size validation handler."
+
+    # Pattern 11: Dropdown / Select Menu Selection
+    elif any(w in text_lower for w in ["dropdown", "select option", "category select", "combo box", "drop down"]):
+        module = "Form Controls > Dropdown Selection"
+        title = "Verify dropdown options populate and persist on selection"
+        scenario = "Verify that clicking the dropdown reveals all available options and correctly sets the form control value."
+        test_data = "Selectable option from dropdown list"
+        steps = "1. Open the target form interface.\n2. Click on the dropdown menu.\n3. Select a specific option from the list.\n4. Observe field state and form payload."
+        expected = "The dropdown should display all active options, update the visible selection upon click, and bind the selected ID."
+        actual = "Dropdown options fail to load (empty list), selection does not persist, or the dropdown closes immediately on click."
+        qa_comment = "Dropdown component state binding failure or lookup API endpoint returning empty array or error."
+
+    # Pattern 12: Modal & Dialog Popup Controls
+    elif any(w in text_lower for w in ["modal", "popup", "dialog", "close icon", "cross button", "backdrop"]):
+        module = "User Interface > Modal Dialogs"
+        title = "Verify modal dialog opens and closes correctly via controls"
+        scenario = "Verify that action triggers open the modal dialog and that clicking the '✕' close icon or backdrop dismisses it."
+        test_data = "Interactive modal popup element"
+        steps = "1. Click the action button that triggers the modal popup.\n2. Verify modal content renders.\n3. Click on the '✕' close button or press 'Escape'.\n4. Observe modal dismissal."
+        expected = "The modal should dismiss smoothly and return focus to the underlying page without locking the background scroll."
+        actual = "The modal close button is unresponsive, clicking outside fails to close, or the page background remains locked (overlay freeze)."
+        qa_comment = "Missing event listener on close trigger or CSS z-index/pointer-events trapping keyboard and mouse interaction."
+
+    # Pattern 13: Role-Based Access Control & Permissions (403 Forbidden)
+    elif any(w in text_lower for w in ["role", "permission", "unauthorized", "403", "forbidden", "access denied", "admin"]):
+        module = "Security & Access Control (RBAC)"
+        title = "Verify role-based access restrictions for unauthorized users"
+        scenario = "Verify that users without administrative privileges are restricted from accessing protected routes or controls."
+        test_data = "Non-admin user account credentials"
+        steps = "1. Log in with a standard non-admin account.\n2. Attempt to navigate directly to an administrative URL (e.g. /super-admin).\n3. Observe access control handling."
+        expected = "The system should restrict access, redirect to an Unauthorized Access (403) page, and hide admin-only navigation links."
+        actual = "The system exposes admin interfaces or action buttons to unauthorized roles, permitting unauthorized privilege escalation."
+        qa_comment = "Missing route guard check in client router and lack of server-side middleware role validation."
+
+    # Pattern 14: Session Expiry & Auto Logout
+    elif any(w in text_lower for w in ["session", "expire", "token", "logout", "log out", "auto logout"]):
+        module = "Authentication > Session Management"
+        title = "Verify automatic redirection to login upon JWT session expiration"
+        scenario = "Verify that when the user authorization token expires, the application gracefully prompts re-authentication."
+        test_data = "User session with expired JWT authorization token"
+        steps = "1. Log in to the application and retain active session.\n2. Allow token to expire or revoke authentication cookie.\n3. Attempt to perform an API-backed action.\n4. Observe redirect behavior."
+        expected = "The application should intercept the 401 response, clear cached user state, and redirect cleanly to /login with a session expired toast."
+        actual = "The application displays a broken blank white screen, infinite spinner, or uncaught console error instead of redirecting."
+        qa_comment = "Missing global HTTP 401 response interceptor in Axios/Fetch client to handle automatic token refresh or logout redirect."
+
+    # Pattern 15: Phone number / Email / Input field validation
     elif any(w in text_lower for w in ["phone", "mobile", "number", "email", "digit"]):
         module = "User Registration & Form Validation"
         title = "Verify field length and format validation during form submission"
@@ -379,7 +467,7 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "The system accepts invalid or short input without displaying any validation error, permitting corrupted data submission."
         qa_comment = "Missing regex or minimum length validation constraint on both client-side and server-side handlers."
 
-    # Pattern 8: Validation error / Duplicate values / Unique constraint
+    # Pattern 16: Validation error / Duplicate values / Unique constraint
     elif any(w in text_lower for w in ["duplicate", "sequence", "unique", "already exists"]):
         if "sequence" in text_lower or "cycle" in text_lower:
             module = "Super Admin > Life Cycle"
@@ -393,7 +481,7 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "The system allows duplicate values to be saved without triggering unique constraint validation."
         qa_comment = "Missing unique validation rule on both frontend form validation and backend database constraints."
 
-    # Pattern 9: Unresponsive controls / Button click does nothing
+    # Pattern 17: Unresponsive controls / Button click does nothing
     elif any(w in text_lower for w in ["kichu hoy na", "kaj kore na", "response nai", "unresponsive", "click korle"]):
         module = "User Interface & Controls"
         title = "Verify primary action trigger executes requested operation"
@@ -404,21 +492,37 @@ Respond with ONLY valid JSON with this exact structure:
         actual = "The control is completely unresponsive; clicking the button fails to trigger any network request or user feedback."
         qa_comment = "Unbound event listener, unhandled promise rejection, or disabled button state in frontend code."
 
-    # Pattern 10: Dynamic Entity Extractor (Guarantees 100% relevant English for any remaining input)
+    # Pattern 18: Smart Contextual Entity Extractor (High Quality Fallback for any other bug)
     else:
-        # Extract keywords from user input
+        # Extract keywords and identify actions and nouns
+        stopwords = {"ami", "amr", "amader", "tmi", "apni", "akta", "ekta", "ar", "kintu", "er", "te", "kore",
+                     "dila", "dile", "dileh", "hobe", "hoy", "na", "to", "ta", "theke", "diye", "jodi", "tobe",
+                     "ar", "oita", "aita", "sheta", "sob", "kisu", "kichu", "pore", "age", "jabe", "jay"}
         words = re.findall(r"\b[a-zA-Z0-9_\-]+\b", problem_text)
-        english_words = [w for w in words if w.lower() not in ["ami", "akta", "ar", "kintu", "amr", "er", "te", "kore", "dila", "dile", "hobe", "hoy", "na", "to", "ta", "theke", "diye"]]
-        topic = " ".join(english_words[:4]).title() if english_words else "System Operation"
+        filtered = [w for w in words if w.lower() not in stopwords]
 
-        module = f"Application Module > {topic}"
-        title = f"Verify {topic} workflow and execution without defects"
-        scenario = f"Verify that user interaction with {topic} produces expected business outcomes according to specifications."
-        test_data = "Standard operational user data"
-        steps = f"1. Log in to the application.\n2. Navigate to {topic} interface.\n3. Perform the designated user action.\n4. Verify system response."
-        expected = f"The {topic} feature should function smoothly and display appropriate status confirmation."
-        actual = f"The {topic} feature encountered an unexpected failure during execution and did not behave as specified."
-        qa_comment = "Functional defect observed during QA manual exploratory testing. Developer investigation required."
+        # Detect error codes
+        err_match = re.search(r"\b(400|401|403|404|409|500|502|503)\b", problem_text)
+        error_code = err_match.group(1) if err_match else None
+
+        # Build topic
+        topic_words = filtered[:4] if filtered else ["Feature"]
+        topic = " ".join(topic_words).title()
+
+        module = f"Application Core > {topic}"
+        title = f"Verify {topic} workflow and functional execution"
+        scenario = f"Verify that user interaction with {topic} produces expected business outcomes without encountering system errors or execution failures."
+        test_data = "Standard operational user inputs"
+        steps = f"1. Log in to the application.\n2. Navigate to the {topic} section.\n3. Execute the designated user action or submission.\n4. Observe system response and outcome."
+        
+        if error_code:
+            expected = f"The operation should complete successfully with an HTTP 200 OK status, and confirmation should appear."
+            actual = f"The operation failed and the backend returned an HTTP {error_code} error response during execution."
+            qa_comment = f"Backend API returned HTTP {error_code}. Inspect server logs, request payload, and endpoint routing."
+        else:
+            expected = f"The {topic} feature should execute smoothly and display appropriate status confirmation."
+            actual = f"The {topic} feature encountered an unexpected defect during execution and did not behave as specified."
+            qa_comment = "Defect identified during QA manual exploratory test execution. Developer investigation required."
 
     return {
         "module": module,
