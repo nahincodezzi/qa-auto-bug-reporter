@@ -487,6 +487,116 @@
             font-size: 13px;
             width: 240px;
         }
+
+        /* Author Credits & Portfolio Bar */
+        .author-credits-banner {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .author-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .author-link::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #2563eb, #3b82f6);
+            opacity: 0.85;
+            transition: width 0.25s ease;
+        }
+        .author-link:hover {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+            transform: translateY(-2px);
+        }
+        .author-link:hover::before {
+            width: 6px;
+        }
+        .author-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .author-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .author-link:hover .author-badge {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+        .author-name {
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .author-name strong {
+            color: #0f172a;
+            font-weight: 700;
+            transition: color 0.2s ease;
+        }
+        .author-link:hover .author-name strong {
+            color: #2563eb;
+        }
+        .author-right {
+            display: flex;
+            align-items: center;
+        }
+        .author-portfolio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            padding: 6px 16px;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+        .author-link:hover .author-portfolio-btn {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+            padding-right: 18px;
+        }
+        .author-link:hover .author-portfolio-btn svg {
+            transform: translate(2px, -2px);
+            transition: transform 0.2s ease;
+        }
     </style>
 </head>
 <body>
@@ -588,6 +698,30 @@
             </div>
         </section>
 
+        <!-- Professional Author Portfolio & Copyright Bar (Exact Position Requested) -->
+        <div class="author-credits-banner">
+            <a href="https://mdjakerullahchowdhurynahin.vercel.app/" target="_blank" rel="noopener noreferrer" class="author-link" title="Click to view MD Jaker Ullah Chowdhury Nahin's Portfolio">
+                <div class="author-left">
+                    <span class="author-badge">👨‍💻 SQA Lead & Developer</span>
+                    <span class="author-name">
+                        <span>© All Rights Reserved</span>
+                        <span style="color: #94a3b8;">&bull;</span>
+                        <strong>MD Jaker Ullah Chowdhury Nahin</strong>
+                    </span>
+                </div>
+                <div class="author-right">
+                    <span class="author-portfolio-btn">
+                        <span>🌐 Visit Portfolio</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+        </div>
+
         <!-- Dynamic Column Spreadsheet Table -->
         <section class="card">
             <div class="card-header">
@@ -669,6 +803,18 @@
                 </div>
             </div>
         </section>
+
+        <!-- Footer Copyright & Portfolio Reference -->
+        <footer style="text-align: center; padding: 10px 0 24px; font-size: 13px; color: #64748b;">
+            <span>© All Rights Reserved &bull; </span>
+            <a href="https://mdjakerullahchowdhurynahin.vercel.app/" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600; text-decoration: none; transition: all 0.15s ease;">
+                MD Jaker Ullah Chowdhury Nahin
+            </a>
+            <span style="color: #94a3b8;"> &bull; </span>
+            <a href="https://mdjakerullahchowdhurynahin.vercel.app/" target="_blank" rel="noopener noreferrer" style="color: #64748b; font-size: 12px; text-decoration: underline;">
+                mdjakerullahchowdhurynahin.vercel.app ↗
+            </a>
+        </footer>
     </main>
 
     <!-- Modal: Select & Delete Columns -->
