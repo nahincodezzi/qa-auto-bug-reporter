@@ -1,33 +1,102 @@
-# 🐞 QA Bug Reporter Pro (UI Application)
+# 🐞 QA Auto Bug Reporter Pro
+> **Transform Raw Banglish / Bengali Problem Descriptions & Screenshots into 100% Professional Corporate SQA Excel Bug Reports Automatically.**
 
-A professional, easy-to-use graphical desktop/web interface for QA engineers. Simply paste a screenshot, describe the problem, and let the automation upload the image to the cloud and append a structured bug report directly into **`bug_report.xlsx`**!
-
----
-
-## 🚀 How to Launch the UI (1-Click):
-
-1. Double-click **`run.bat`** in this folder.
-2. The professional QA dashboard opens automatically in your browser (`http://127.0.0.1:5000`).
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Framework-Flask%203.x-green.svg)](https://flask.palletsprojects.com/)
+[![AI Model](https://img.shields.io/badge/AI%20Model-Gemini%202.5%20Pro-purple.svg)](https://aistudio.google.com/)
+[![Excel](https://img.shields.io/badge/Spreadsheet-OpenPyXL-brightgreen.svg)](https://openpyxl.readthedocs.io/)
 
 ---
 
-## ✨ Features & How to Use:
+## 📖 প্রকল্প পরিচিতি (Overview)
+**QA Auto Bug Reporter Pro** হলো সফটওয়্যার কোয়ালিটি অ্যাসিউরেন্স (SQA) ইঞ্জিনিয়ার ও টেস্টারদের জন্য তৈরি একটি স্বয়ংক্রিয় ডেস্কটপ-ওয়েব অ্যাপ্লিকেশন। ম্যানুয়ালি টেস্ট কেস লেখা, একাধিক স্ক্রিনশট ক্লাউডে আপলোড করা, লিঙ্ক কপি-পেস্ট করা এবং এক্সেলে প্রতিটি কলাম টাইপ করার জটিল ঝামেলা চিরতরে দূর করতেই এই সিস্টেমটি তৈরি করা হয়েছে।
 
-1. **Clipboard Paste (<kbd>Ctrl</kbd> + <kbd>V</kbd>):**
-   - Take a screenshot using Windows Snipping Tool (<kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>).
-   - Press <kbd>Ctrl</kbd> + <kbd>V</kbd> anywhere on the page to paste the screenshot instantly (no need to save to disk!).
-   - Alternatively, drag and drop an image file.
+টেস্টার কেবল সমস্যার ১ বা একাধিক স্ক্রিনশট পেস্ট করবেন (<kbd>Ctrl</kbd> + <kbd>V</kbd>) এবং বাংলিশ বা বাংলায় যা ঘটেছে তা লিখবেন। সিস্টেমটি মুহূর্তের মধ্যে:
+1. সব স্ক্রিনশট ক্লাউডে পার্মানেন্ট ডিরেক্ট লিঙ্কে আপলোড করে।
+2. **Google Gemini 2.5 Pro Vision AI** অথবা অন্তর্নির্মিত **স্মার্ট সেম্যান্টিক NLP ইঞ্জিন** দিয়ে সমস্যাটি বিশ্লেষণ করে ১০০% আন্তর্জাতিক মানের কর্পোরেট SQA টেস্ট কেসে রূপান্তর করে।
+3. তারিখভিত্তিক অটো-জেনারেটেড TID (`TID<মাস><তারিখ><ক্রমিক>`) সহ আপনার একক মাস্টার এক্সেল ফাইল **`bug_report.xlsx`**-এ স্বয়ংক্রিয়ভাবে যুক্ত করে দেয়।
 
-2. **Describe Problem in Any Language:**
-   - Write the defect in Bengali, Banglish, or English (e.g. *"applicant end a amr akta application asa kintu dash a zero dekay"*).
-   - The smart engine translates and structures it into professional QA English.
+---
 
-3. **Click `🚀 Add to Excel Bug Report`:**
-   - Automatically uploads image to cloud storage (generating a permanent Lightshot-style link).
-   - Automatically populates all 15 columns:
-     `TID | Module | Title | Scenario | Test Data | Steps | Expected | Actual | Status | Screenshort | Dev Comment | QA Comment | Status | Dev | Dev Comennt`
-   - Appends to **`bug_report.xlsx`**.
+## 🚀 ১-ক্লিকে চালু করার নিয়ম (Quick Start)
+1. এই ফোল্ডারে থাকা **`run.bat`** ফাইলে ডাবল-ক্লিক করুন।
+2. সার্ভার চালু হয়ে আপনার ডিফল্ট ওয়েব ব্রাউজারে স্বয়ংক্রিয়ভাবে ড্যাশবোর্ড খুলে যাবে: `http://127.0.0.1:5000`
 
-4. **1-Click Excel Access:**
-   - Click the **`📂 Open Excel File`** button on top to launch the spreadsheet directly in Microsoft Excel!
-   - Or click **`📥 Download .xlsx`**.
+---
+
+## 🛠️ সিস্টেম আর্কিটেকচার ও টেকনিক্যাল ফিচারসমূহ
+
+### ১. ফ্রন্টএন্ড লেয়ার (Modern Glassmorphism UI)
+* **টেকনোলজি:** HTML5, CSS3, Modern JavaScript (ES6+), Jinja2 Templating।
+* **সরাসরি ক্লিপবোর্ড পেস্ট (<kbd>Ctrl</kbd> + <kbd>V</kbd>):** উইন্ডোজের Snipping Tool (<kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>) দিয়ে স্ক্রিনশট নিয়ে সরাসরি ব্রাউজারে পেস্ট করলেই ইমেজ ডিটেক্ট হয়। ফাইল ব্রাউজ বা হার্ডডিস্কে সেভ করার কোনো প্রয়োজন নেই।
+* **মাল্টি-স্ক্রিনশট গ্যালারি:** একসাথে ১ থেকে একাধিক স্ক্রিনশট ক্রমানুসারে ড্রপ বা পেস্ট করা যায় এবং থাম্বনেইল থেকে ডিলিট করা যায়।
+* **অ্যাসিনক্রোনাস কমিউনিকেশন (`fetch` API):** পেজ রিলোড না করেই ব্যাকগ্রাউন্ডে ইমেজ ক্লাউড আপলোড ও এক্সেল সিঙ্ক সম্পন্ন হয়।
+
+### ২. ব্যাকএন্ড লেয়ার (Python Microservice)
+* **টেকনোলজি:** Python 3.10+, Flask, Threading, Dotenv।
+* **অটো-লঞ্চ থ্রেড (`threading.Thread`):** Flask সার্ভার বুট হওয়ার ১.২ সেকেন্ডের মাথায় ব্যবহারকারীর ওয়েব ব্রাউজার ওপেন করে।
+* **উইন্ডোজ ফাইল-লক প্রটেকশন (`PermissionError` Handler):** ইউজার যদি মাইক্রোসফট এক্সেলে `bug_report.xlsx` ওপেন করে রাখেন, তবে কোড ক্র্যাশ না করে ফ্রন্টএন্ডে ফ্রেন্ডলি ওয়ার্নিং পাঠায় যাতে ইউজার এক্সেল বন্ধ করে পুনরায় ট্রাই করতে পারেন।
+
+### ৩. ইন্টেলিজেন্ট AI ও ভিশন ইঞ্জিন (Gemini 2.5 Pro)
+* **গুগল জেনএআই SDK (`google-genai`):** গুগল এর ফ্ল্যাগশিপ ডিপ-রিজনিং মডেল **`gemini-2.5-pro`** ব্যবহৃত হয়।
+* **মাল্টি-মডেল ক্যাসকেড (Graceful Fallback):**
+  $$\text{gemini-2.5-pro} \longrightarrow \text{gemini-2.5-flash} \longrightarrow \text{gemini-2.0-flash} \longrightarrow \text{gemini-1.5-pro}$$
+  একটি মডেল কোনো কারণে রেট-লিমিট খেলে সিস্টেম স্বয়ংক্রিয়ভাবে দ্বিতীয় মডেলে শিফট করে।
+* **মাল্টিমোডাল ভিশন প্রসেসিং:** ব্যবহারকারীর স্ক্রিনশট বাইনারি মেমোরি থেকে সরাসরি মডেলে পাঠানো হয়, ফলে AI স্ক্রিনশটের URL বার, বাটন স্টেট, এরর ব্যানার এবং ইনপুট ফিল্ড চোখের মতো দেখতে পারে।
+* **ডিপ-রিলেভেন্স SQA প্রম্পট:** কোনো জেনেরিক ডামি লেখা নয়; ব্যবহারকারীর ইনপুটের উপাদানগুলো দিয়ে নিখুঁত টেস্ট ডাটা, স্টেপস, এবং এক্সপেক্টেড/অ্যাকচুয়াল রেজাল্ট তৈরি হয়।
+
+### ৪. অফলাইন স্মার্ট সেম্যান্টিক NLP ইঞ্জিন (Zero API Key Mode)
+* নেট না থাকলে বা API Key না বসালেও সিস্টেমটি নিষ্ক্রিয় হয় না।
+* এতে রয়েছে অ্যাডভান্সড ডোমেইন রিকগনিশন (Login/Auth, Password Reset, Dynamic Form Builder, Delete 404, Dashboard Counter, Page Navigation Freeze, Input Validation ইত্যাদি)।
+* ডাইনামিক এনটিটি এক্সট্রাক্টর দিয়ে ব্যবহারকারীর ইনপুটের নাম ও ঘটনা সরাসরি SQA টার্মে কনভার্ট করে।
+
+### ৫. ক্লাউড ইমেজ হোস্টিং (Direct Permanent Links)
+* ফ্রি ইমেজ হোস্টিং API (`freeimage.host`) এবং ক্যাটবক্স ব্যাকআপ ইঞ্জিন।
+* মেমোরি স্ট্রিম (`io.BytesIO`) ব্যবহার করে ইমেজ প্রসেস হয়।
+* এক্সেলের সেলে সরাসরি ক্লিকযোগ্য পার্মানেন্ট লিংক যুক্ত হয়: `https://iili.io/xyz.png`।
+
+### ৬. এক্সেল অটোমেশন ও শিট কম্প্যাকশন ইঞ্জিন (`openpyxl`)
+* **১৫টি প্রফেশনাল কর্পোরেট কলাম:**
+  `TID` | `Module` | `Test Case Title` | `Test Scenario` | `Test Data` | `Test Step` | `Expected Result` | `Actual Result` | `Status` | `Screenshort` | `Dev Comment` | `QA Comment` | `Status` | `Dev` | `Dev Comennt`
+* **তারিখভিত্তিক ডাইনামিক TID:**
+  ফরম্যাট: `TID<মাস><তারিখ><২ ডিজিট ক্রম>`
+  উদাহরণ: নভেম্বর মাসের ৫ তারিখের বাগগুলো হবে `TID11501`, `TID11502`... এবং ৬ তারিখের বাগ হবে `TID11601`।
+* **হাইপারলিংক রি-অ্যালাইনমেন্ট ও অটো-কম্প্যাকশন (`compact_worksheet`):** Openpyxl-এ রো ডিলিট করার পর হাইপারলিংক অরফান কো-অর্ডিনেট desync বাগ দূর করে খালি রো তৈরি হওয়া চিরতরে নির্মূল করা হয়েছে।
+* **ডাইনামিক কলাম ডিলিটেশন:** ইউজার UI থেকে যেকোনো অপ্রয়োজনীয় কলাম সিলেক্ট করে মুছে ফেললে এক্সেল ফাইলের হেডার ও ডেটা স্বয়ংক্রিয়ভাবে অ্যাডজাস্ট হয়।
+
+---
+
+## 📘 ব্যবহারকারীর নির্দেশিকা (User Manual)
+
+### ধাপ ১: প্রোগ্রাম ওপেন করা
+ফোল্ডারের **`run.bat`** ফাইলে ডাবল-ক্লিক করুন। ব্রাউজারে ড্যাশবোর্ড ওপেন হবে।
+
+### ধাপ ২: AI মডেল ও Key সেট করা (প্রস্তাবিত)
+1. ওপরের ন্যাভবারে **`AI Model`** বাটনে ক্লিক করুন।
+2. আপনার গুগল জেমিনি API Key বসান (ফ্রি কি পেতে লিংকে ক্লিক করুন)।
+3. ড্রপডাউন থেকে **`Gemini 2.5 Pro`** সিলেক্ট করুন।
+4. **`🔌 Test Connection`** চাপুন। সবুজ সাকসেস মেসেজ আসলে **`💾 Save Settings`** বাটনে ক্লিক করুন।
+*(একবার সেভ করলে এটি চিরতরে আপনার `.env` ফাইলে সংরক্ষিত থাকবে)*
+
+### ধাপ ৩: স্ক্রিনশট ও বাগ ডেসক্রিপশন দেওয়া
+1. বাগযুক্ত স্ক্রিনের ছবি তুলুন (<kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>)।
+2. ব্রাউজারে এসে <kbd>Ctrl</kbd> + <kbd>V</kbd> চাপুন (একসাথে একাধিক স্ক্রিনশট পেস্ট করতে পারেন)।
+3. ডেসক্রিপশন বক্সে আপনার মতো করে বাংলিশ, বাংলা বা সহজ ইংরেজিতে সমস্যাটি লিখুন।
+   * *উদাহরণ:* `login button a click korle loader ghurteche kintu login hocche na`
+   * *উদাহরণ:* `applicant portal a submitted application 1 ta thakleo dashboard a zero dekay`
+
+### ধাপ ৪: এক্সেলে সেভ করা
+* নীল রঙের **`🚀 Convert to Professional QA English & Add to Excel`** বাটনে ক্লিক করুন।
+* কয়েক সেকেন্ডের মধ্যে স্ক্রিনশট ক্লাউডে আপলোড হবে এবং নিচে টেবিল ও `bug_report.xlsx`-এ সম্পূর্ণ প্রফেশনাল টেস্ট কেস যুক্ত হয়ে যাবে।
+
+### ধাপ ৫: এক্সেল দেখা বা ম্যানেজ করা
+* ওপরের সবুজ **`📂 Open bug_report.xlsx`** বাটনে চাপলে সরাসরি মাইক্রোসফট এক্সেলে ফাইলটি ওপেন হবে।
+* **`🗑️ Select & Delete Columns`** ব্যবহার করে অপ্রয়োজনীয় কলাম মুছতে পারবেন।
+* টেবিলের ডানপাশের লাল ডাস্টবিন আইকন (**`🗑️`**) দিয়ে যেকোনো বাতিল রো মুছে ফেলতে পারবেন।
+
+---
+
+## 🔒 নিরাপত্তা ও ডেটা ইন্টিগ্রিটি
+* কোনো ডেটা বা স্ক্রিনশট তৃতীয় পক্ষের ব্যক্তিগত সার্ভারে পাঠানো হয় না।
+* API Key ব্যবহারকারীর লোকাল `.env` ফাইলে থাকে যা গিটহাবে পুশ হওয়া থেকে `.gitignore` দ্বারা সংরক্ষিত।
+* এক্সেল ফাইলের ফরম্যাটিং, বর্ডার এবং কালার কোডিং কর্পোরেট SQA স্ট্যান্ডার্ড বজায় রাখে।
