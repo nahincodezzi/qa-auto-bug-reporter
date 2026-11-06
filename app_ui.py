@@ -89,14 +89,15 @@ def api_add_bug():
     first_mime = "image/png"
 
     for idx, file in enumerate(image_files, 1):
-        if file and file.filename != "":
+        if file:
             img_bytes = file.read()
-            if img_bytes:
+            if img_bytes and len(img_bytes) > 0:
+                fname = file.filename or f"screenshot_{idx}.png"
                 if first_img_bytes is None:
                     first_img_bytes = img_bytes
                     first_mime = file.mimetype or "image/png"
-                url = upload_image_bytes(img_bytes, file.filename or f"screenshot_{idx}.png")
-                if url and url != "Upload failed":
+                url = upload_image_bytes(img_bytes, fname)
+                if url and url != "Upload failed" and url != "-":
                     cloud_urls.append(url)
 
     if len(cloud_urls) == 1:
@@ -260,6 +261,13 @@ def api_download():
     if p.exists():
         return send_file(str(p), as_attachment=True, download_name=EXCEL_FILE)
     return "Excel file not found", 404
+
+@app.route("/screenshots/<path:filename>")
+def serve_screenshot(filename):
+    p = (Path("screenshots") / filename).resolve()
+    if p.exists():
+        return send_file(str(p))
+    return "Screenshot not found", 404
 
 def open_browser():
     time.sleep(1.2)

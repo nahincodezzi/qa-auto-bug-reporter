@@ -1050,7 +1050,11 @@
             const formData = new FormData();
             formData.append("problem", text);
             formData.append("model", selectAiModel ? selectAiModel.value : "gemini-3.5-flash");
-            selectedFiles.forEach((file) => formData.append("images", file));
+            selectedFiles.forEach((file, idx) => {
+                const ext = (file.type && file.type.includes("/")) ? file.type.split("/")[1].replace("jpeg", "jpg") : "png";
+                const fname = file.name || `screenshot_${Date.now()}_${idx + 1}.${ext}`;
+                formData.append("images", file, fname);
+            });
 
             try {
                 const res = await fetch("/api/add_bug", {
