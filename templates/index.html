@@ -534,23 +534,23 @@
                             <!-- Hidden actual file input supporting all image extensions -->
                             <input type="file" id="fileInput" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.jfif" multiple style="display: none;">
                             
-                            <!-- Interactive Drop Zone -->
-                            <div class="drop-zone" id="dropZone" style="cursor: pointer; text-align: center; padding: 24px 16px;">
+                            <!-- Interactive Drop Zone as Native Label (Reliable Native File Dialog Trigger) -->
+                            <label for="fileInput" class="drop-zone" id="dropZone" style="display: block; cursor: pointer; text-align: center; padding: 24px 16px; margin-bottom: 0;">
                                 <div class="drop-icon" style="font-size: 36px; margin-bottom: 6px;">📸</div>
                                 <div class="drop-title" id="dropZoneTitle" style="font-size: 14px; font-weight: 600; color: #1e293b;">
                                     Drop 1 or multiple screenshots here, or click to browse
                                 </div>
                                 <div style="margin-top: 10px;">
-                                    <button type="button" class="btn btn-sm btn-primary" id="btnBrowseFiles" style="padding: 7px 16px; font-size: 13px; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+                                    <span class="btn btn-sm btn-primary" id="btnBrowseFiles" style="display: inline-block; padding: 7px 16px; font-size: 13px; box-shadow: 0 2px 4px rgba(37,99,235,0.2); pointer-events: none;">
                                         📁 Select Screenshot / Image Files
-                                    </button>
+                                    </span>
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <span class="pill-badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
                                         💡 Tip: You can also press <strong>Ctrl + V</strong> anywhere to paste directly!
                                     </span>
                                 </div>
-                            </div>
+                            </label>
 
                             <!-- Attached Screenshots Thumbnail Gallery -->
                             <div class="gallery-wrapper" id="galleryWrapper" style="display: none; margin-top: 14px;">
@@ -807,7 +807,6 @@
         const btnCloseApiKeyModal = document.getElementById("btnCloseApiKeyModal");
         const btnCancelApiKey = document.getElementById("btnCancelApiKey");
         const btnSaveApiKey = document.getElementById("btnSaveApiKey");
-        const inputApiKeyVal = document.getElementById("inputApiKeyVal");
 
         function showToast(msg) {
             toast.textContent = msg;
@@ -909,17 +908,6 @@
             showToast("🧹 All attached screenshots cleared.");
         });
 
-        // Click handler for dedicated 'Browse & Select Files' button
-        btnBrowseFiles.addEventListener("click", (e) => {
-            e.stopPropagation();
-            fileInput.click();
-        });
-
-        // Click handler for entire Drop Zone container
-        dropZone.addEventListener("click", () => {
-            fileInput.click();
-        });
-
         // File input change event (triggers after picking files in native dialog)
         fileInput.addEventListener("change", (e) => {
             if (e.target.files && e.target.files.length > 0) {
@@ -961,9 +949,11 @@
             }
         }, false);
 
-        // Global Paste (<kbd>Ctrl</kbd> + <kbd>V</kbd>) from OS Clipboard
+        // Global Paste (Ctrl + V) from OS Clipboard
         window.addEventListener("paste", (e) => {
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            const clipboardData = e.clipboardData || window.clipboardData;
+            if (!clipboardData || !clipboardData.items) return;
+            const items = clipboardData.items;
             const pastedImages = [];
             for (let item of items) {
                 if (item.kind === "file") {

@@ -21,6 +21,8 @@ from main import (
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024  # 32 MB
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.jinja_env.auto_reload = True
 
 def read_all_reports_from_excel(file_path: str = EXCEL_FILE) -> tuple:
     """Reads current headers and all valid rows dynamically from bug_report.xlsx, strictly ignoring phantom rows."""
