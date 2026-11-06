@@ -107,7 +107,7 @@ def api_add_bug():
         cloud_url = "-"
 
     # Structure into 100% professional QA format using AI / Smart Engine
-    model_name = request.form.get("model") or os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
+    model_name = request.form.get("model") or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
     qa_data = convert_problem_to_qa_report(
         problem_text=problem_text,
         image_bytes=first_img_bytes,
@@ -204,7 +204,7 @@ def api_ai_status():
     return jsonify({
         "success": True,
         "active": bool(api_key),
-        "model": model or "gemini-2.5-pro",
+        "model": model or "gemini-3.5-flash",
         "masked_key": masked_key
     })
 
@@ -212,7 +212,7 @@ def api_ai_status():
 def api_test_ai_key():
     data = request.json or {}
     key = data.get("api_key", "").strip()
-    model = data.get("model", "gemini-2.5-pro").strip()
+    model = data.get("model", "gemini-3.5-flash").strip()
     if not key:
         return jsonify({"success": False, "error": "API Key is required."}), 400
 
@@ -223,7 +223,7 @@ def api_test_ai_key():
 def api_set_api_key():
     data = request.json or {}
     key = data.get("api_key", "").strip()
-    model = data.get("model", "gemini-2.5-pro").strip()
+    model = data.get("model", "gemini-3.5-flash").strip()
     
     os.environ["GEMINI_API_KEY"] = key
     os.environ["GEMINI_MODEL"] = model

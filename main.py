@@ -163,19 +163,20 @@ def parse_markdown_table_or_structured(text: str) -> dict:
             }
     return None
 
-def test_gemini_connection(api_key: str, model_name: str = "gemini-2.5-pro") -> tuple:
+def test_gemini_connection(api_key: str, model_name: str = "gemini-3.5-flash") -> tuple:
     """Tests if a Gemini API key and model work properly."""
     if not api_key or not api_key.strip():
         return False, "API Key is empty."
     try:
         from google import genai
         client = genai.Client(api_key=api_key.strip())
+        target_model = model_name or "gemini-3.5-flash"
         res = client.models.generate_content(
-            model=model_name or "gemini-2.5-pro",
+            model=target_model,
             contents="Reply with ONLY the word: OK"
         )
         if res and res.text:
-            return True, f"Connected successfully to {model_name or 'gemini-2.5-pro'}!"
+            return True, f"Connected successfully to {target_model}!"
         return False, "No response from Gemini API."
     except Exception as e:
         return False, str(e)
@@ -205,7 +206,7 @@ def convert_problem_to_qa_report(
         load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY", "").strip()
 
-    chosen_model = model_name or os.getenv("GEMINI_MODEL", "gemini-2.5-pro").strip() or "gemini-2.5-pro"
+    chosen_model = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash").strip() or "gemini-3.5-flash"
 
     if api_key:
         from google import genai
@@ -252,14 +253,15 @@ Respond with ONLY valid JSON with this exact structure:
 }}"""
         contents.append(prompt)
 
-        # Multi-model cascade: try preferred model first, then fallback to other Gemini models
+        # Multi-model cascade: try preferred model first, then fallback to other fast & high-reasoning Gemini models
         candidate_models = [
             chosen_model,
-            "gemini-2.5-pro",
-            "gemini-2.5-flash",
-            "gemini-2.0-flash",
-            "gemini-1.5-pro",
-            "gemini-1.5-flash"
+            "gemini-3.5-flash",
+            "gemini-3.1-flash-lite",
+            "gemini-3.8-flash",
+            "gemini-3.1-pro-preview",
+            "gemini-flash-latest",
+            "gemini-pro-latest"
         ]
         models_to_try = list(dict.fromkeys([m for m in candidate_models if m]))
 
